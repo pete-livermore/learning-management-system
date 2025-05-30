@@ -1,0 +1,38 @@
+version: '3.8'
+
+name: learning_management_system
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - '1433:1433'
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      MSSQL_PID: 'Developer'
+    networks:
+      - sql_network
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  sqlcmd:
+    image: mcr.microsoft.com/mssql-tools:latest
+    container_name: sqlcmd
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    command: /opt/mssql-init/init-db.sh
+    stdin_open: true
+    volumes:
+      - ./src/LearningManagementSystem/Infrastructure/Database/init.sql:/opt/mssql-init/init.sql
+      - ./.scripts/mssql/init-db-in-container.sh:/opt/mssql-init/init-db.sh
+    networks:
+      - sql_network
+
+networks:
+  sql_network:
+    name: sql_network
+
+volumes:
+  mssql_data:
+
