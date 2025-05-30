@@ -1,5 +1,7 @@
 namespace WebApi;
 
+using Infrastructure.Persistence;
+
 public class Startup
 {
     public IConfiguration Configuration { get; }
@@ -9,7 +11,10 @@ public class Startup
         Configuration = configuration;
     }
 
-    public void ConfigureServices(IServiceCollection services) { }
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddPersistenceInfrastructure(Configuration);
+    }
 
     public void Configure(IApplicationBuilder app)
     {

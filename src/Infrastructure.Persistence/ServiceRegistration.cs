@@ -1,4 +1,6 @@
+using Application.Interfaces.Users;
 using Infrastructure.Persistence.Contexts;
+using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,5 +17,7 @@ public static class ServiceRegistration
         services.AddDbContext<LearningManagementSystemDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("SqlServer"))
         );
+
+        services.AddScoped<IUsersRepository, UsersRepository>();
     }
 }
