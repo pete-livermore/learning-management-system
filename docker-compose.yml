@@ -2,6 +2,12 @@ version: '3.8'
 
 name: learning_management_system
 services:
+  redis_main:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - '6379:6379'
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
@@ -35,4 +41,3 @@ networks:
 
 volumes:
   mssql_data:
-
