@@ -12,12 +12,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Dtos/Response/" />
     <Folder Include="Services/CourseEnrolments/" />
+    <Folder Include="UseCases/Users/Validators/" />
   </ItemGroup>
 
 </Project>
