@@ -4,12 +4,23 @@ using Application.Interfaces.Users;
 using Domain.Entities;
 using Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class UsersRepository(LearningManagementSystemDbContext context) : IUsersRepository
+    public class UsersRepository : IUsersRepository
     {
-        private readonly LearningManagementSystemDbContext _context = context;
+        private readonly LearningManagementSystemDbContext _context;
+        private readonly ILogger<UsersRepository> _logger;
+
+        public UsersRepository(
+            LearningManagementSystemDbContext context,
+            ILogger<UsersRepository> logger
+        )
+        {
+            _context = context;
+            _logger = logger;
+        }
 
         public async Task<User> Add(User newUser)
         {
@@ -21,7 +32,15 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<User?> FindById(int id)
         {
-            return await _context.Users.FindAsync(id);
+            try
+            {
+                return await _context.Users.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user with Id {UserId}", id);
+                throw;
+            }
         }
 
         public async Task<User?> FindByEmail(string email)
