@@ -108,5 +108,24 @@ namespace WebApi.v1.Controllers
             }
             return CreatedAtAction(nameof(Replace), new { id }, result.Value);
         }
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var deleteUserResult = await _mediator.Send(new DeleteUserCommand() { UserId = id });
+
+            if (!deleteUserResult.IsFailure)
+            {
+                return deleteUserResult.Error.Code switch
+                {
+                    "Users.NotFound" => NotFound(deleteUserResult.Error),
+                    _ => GenericErrorResponse(),
+                };
+            }
+
+            return NoContent();
+        }
     }
 }
