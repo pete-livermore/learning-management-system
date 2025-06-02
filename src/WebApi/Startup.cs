@@ -5,6 +5,7 @@ using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Shared;
 using WebApi.Extensions;
+using WebApi.Services;
 
 public class Startup
 {
@@ -23,12 +24,15 @@ public class Startup
         services.AddIdentityInfrastructure(Configuration);
         services.AddControllers();
         services.AddApiVersioningExtension();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
     }
 
     public void Configure(IApplicationBuilder app)
     {
         app.UsePathBase(new PathString("/api"));
         app.UseRouting();
+        app.UseExceptionHandler();
         app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
 }
