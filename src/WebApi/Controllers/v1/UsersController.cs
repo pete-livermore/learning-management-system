@@ -66,7 +66,7 @@ namespace WebApi.v1.Controllers
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPatch("{id}")]
@@ -85,6 +85,28 @@ namespace WebApi.v1.Controllers
                 };
             }
             return NoContent();
+        }
+
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Replace(int id, [FromBody] ReplaceUserDto replaceUserDto)
+        {
+            var result = await _mediator.Send(
+                new ReplaceUserCommand() { UserId = id, ReplaceCommand = replaceUserDto }
+            );
+
+            if (result.IsFailure)
+            {
+                return Enum.Parse<UserErrors.Code>(result.Error.Code) switch
+                {
+                    UserErrors.Code.NotFound => NotFound(),
+                    _ => GenericErrorResponse(),
+                };
+            }
+            return CreatedAtAction(nameof(Replace), new { id }, result.Value);
         }
     }
 }
