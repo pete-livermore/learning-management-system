@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Application.Interfaces.Cache;
+using Application.Common.Interfaces.Cache;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
