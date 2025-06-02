@@ -51,6 +51,31 @@ namespace WebApi.v1.Controllers
             return CreatedAtAction(nameof(Create), new { id = newUser.Id }, newUser);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ApiResponse>> GetUsers([FromQuery] GetUsersQueryDto query)
+        {
+            var filters = new UserFiltersDto() { Email = query.Filters.Email };
+            var paginationParams = new PaginationParamsDto()
+            {
+                PageIndex = query.Start ?? 1,
+                PageSize = query.Pages ?? 30,
+            };
+
+            var findUsersResult = await _mediator.Send(
+                new GetUsersQuery() { Filters = filters, Pagination = paginationParams }
+            );
+
+            if (findUsersResult.IsFailure)
+            {
+                return GenericErrorResponse();
+            }
+
+            return new ApiResponse(findUsersResult.Value);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse>> GetById(int id)
         {
