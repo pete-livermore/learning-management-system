@@ -9,9 +9,9 @@ public abstract class BaseEntity
         get => _updatedAt;
         set
         {
-            if (value < DateTime.UtcNow)
+            if (value > DateTime.UtcNow)
             {
-                throw new ArgumentException("Updated date cannot be in the past");
+                throw new ArgumentException("Updated date cannot be in the future");
             }
             _updatedAt = value;
         }
