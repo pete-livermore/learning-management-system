@@ -22,12 +22,12 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
     }
 
     public async Task<Result<UserDto>> Handle(
-        ReplaceUserCommand query,
+        ReplaceUserCommand request,
         CancellationToken cancellationToken
     )
     {
-        var userId = query.UserId;
-        var replaceUserDto = query.ReplaceCommand;
+        var userId = request.UserId;
+        var replaceUserDto = request.ReplaceCommand;
         var existingUser = await _usersRepository.FindById(userId);
 
         if (existingUser is null)
