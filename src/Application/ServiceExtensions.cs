@@ -1,6 +1,6 @@
 namespace Application
 {
-    using Application.UseCases.Users.Queries;
+    using FluentValidation;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class ServiceExtensions
@@ -11,6 +11,8 @@ namespace Application
             {
                 options.RegisterServicesFromAssembly(typeof(ServiceExtensions).Assembly);
             });
+
+            services.AddValidatorsFromAssemblyContaining(typeof(ServiceExtensions));
         }
     }
 }
