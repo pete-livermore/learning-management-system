@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Application.Dtos;
 using Application.Dtos.User;
 using Application.Errors;
@@ -24,6 +25,10 @@ namespace WebApi.v1.Controllers
         private ObjectResult GenericErrorResponse() =>
             StatusCode(500, new { message = "An unexpected error occurred." });
 
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] CreateUserDto createUserDto)
         {
@@ -58,6 +63,28 @@ namespace WebApi.v1.Controllers
             }
 
             return new ApiResponse(result.Value);
+        }
+
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto updateUserDto)
+        {
+            var result = await _mediator.Send(
+                new UpdateUserCommand() { UserId = id, UpdateCommand = updateUserDto }
+            );
+
+            if (result.IsFailure)
+            {
+                return Enum.Parse<UserErrors.Code>(result.Error.Code) switch
+                {
+                    UserErrors.Code.NotFound => NotFound(result.Error),
+                    _ => GenericErrorResponse(),
+                };
+            }
+            return NoContent();
         }
     }
 }
