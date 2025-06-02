@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Cache;
+﻿using Application.Common.Interfaces.Cache;
 using Infrastructure.Shared.Configuration.Redis;
 using Infrastructure.Shared.Services.Cache;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +8,7 @@ namespace Infrastructure.Shared;
 
 public static class ServiceRegistration
 {
-    public static void AddSharedInfrastructure(
+    private static void AddCacheInfrastructure(
         this IServiceCollection services,
         IConfiguration config
     )
@@ -28,5 +28,13 @@ public static class ServiceRegistration
         });
 
         services.AddScoped<ICacheService, CacheService>();
+    }
+
+    public static void AddSharedInfrastructure(
+        this IServiceCollection services,
+        IConfiguration config
+    )
+    {
+        services.AddCacheInfrastructure(config);
     }
 }
