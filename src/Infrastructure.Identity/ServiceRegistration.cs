@@ -1,9 +1,13 @@
 using System.Text;
 using Application.Interfaces.Auth;
 using Domain.Entities;
+using Infrastructure.Identity.Services;
+using LearningManagementSystem.Infrastructure.Identity.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Identity;
 
@@ -14,6 +18,37 @@ public static class ServiceRegistration
         IConfiguration config
     )
     {
+        var securityConfig = config.GetSection(SecurityOptions.Security).Get<SecurityOptions>();
+        if (securityConfig is null)
+        {
+            throw new InvalidOperationException(
+                $"{SecurityOptions.Security} config is missing or incomplete in appsettings.json."
+            );
+        }
+
+        var jwtConfig = securityConfig.Jwt;
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtConfig.Issuer,
+                    ValidAudience = jwtConfig.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtConfig.SecretKey)
+                    ),
+                }
+            );
+
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        services.AddScoped<ITokenService, TokenService>();
     }
 }
