@@ -1,4 +1,4 @@
-namespace Infrastructure.Persistence.Configurations;
+namespace Infrastructure.Persistence.EntityConfigurations;
 
 using Domain.Entities;
 using Domain.Enums;
