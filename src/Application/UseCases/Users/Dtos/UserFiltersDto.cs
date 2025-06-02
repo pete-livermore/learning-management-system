@@ -1,4 +1,4 @@
-namespace Application.Dtos.User;
+namespace Application.UseCases.Users.Dtos;
 
 public record UserFiltersDto
 {

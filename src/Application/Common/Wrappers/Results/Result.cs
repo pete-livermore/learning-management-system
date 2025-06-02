@@ -1,6 +1,6 @@
 using Application.Errors;
 
-namespace Application.Results;
+namespace Application.Wrappers.Results;
 
 public class Result
 {

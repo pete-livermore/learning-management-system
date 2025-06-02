@@ -1,6 +1,6 @@
 using Application.Dtos.Auth;
 
-namespace Application.Interfaces.Auth;
+namespace Application.Common.Interfaces.Token;
 
 public interface ITokenService
 {

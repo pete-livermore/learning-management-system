@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace Application.Dtos.User
+namespace Application.UseCases.Users.Dtos
 {
+    using System.ComponentModel.DataAnnotations;
+
     public record ReplaceUserDto
     {
         [Required]

@@ -1,4 +1,4 @@
-namespace Application.Dtos;
+namespace Application.Common.Dtos;
 
 public record PaginationParamsDto
 {

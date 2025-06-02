@@ -1,4 +1,6 @@
-namespace Application.Errors;
+using Application.Common.Errors;
+
+namespace Application.UseCases.Auth.Errors;
 
 public static class AuthErrors
 {

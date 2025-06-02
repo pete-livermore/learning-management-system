@@ -7,7 +7,7 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Application.UseCases.Auth;
+namespace Application.UseCases.Auth.Commands;
 
 public record class LoginCommand : IRequest<Result<string>>
 {

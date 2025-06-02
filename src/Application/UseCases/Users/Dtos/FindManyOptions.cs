@@ -1,4 +1,6 @@
-namespace Application.Dtos.User;
+using Application.Common.Dtos;
+
+namespace Application.UseCases.Users.Dtos;
 
 public class FindManyOptionsDto
 {
