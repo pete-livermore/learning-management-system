@@ -2,7 +2,9 @@ using Application.Dtos.User;
 using Application.Errors;
 using Application.Interfaces.Users;
 using Application.Wrappers.Results;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.UseCases.Users.Commands;
 
@@ -15,10 +17,15 @@ public record class ReplaceUserCommand : IRequest<Result<UserDto>>
 public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Result<UserDto>>
 {
     private readonly IUsersRepository _usersRepository;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    public ReplaceUserCommandHandler(IUsersRepository usersRepository)
+    public ReplaceUserCommandHandler(
+        IUsersRepository usersRepository,
+        IPasswordHasher<User> passwordHasher
+    )
     {
         _usersRepository = usersRepository;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<Result<UserDto>> Handle(
@@ -38,7 +45,8 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
         existingUser.Email = replaceUserDto.Email;
         existingUser.FirstName = replaceUserDto.FirstName;
         existingUser.LastName = replaceUserDto.LastName;
-        existingUser.Password = replaceUserDto.Password;
+        string hashedPassword = _passwordHasher.HashPassword(existingUser, replaceUserDto.Password);
+        existingUser.Password = hashedPassword;
         existingUser.Role = existingUser.Role;
 
         var updatedUserRecord = await _usersRepository.Update(existingUser);

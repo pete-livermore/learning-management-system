@@ -3,7 +3,9 @@ using Application.Errors;
 using Application.Interfaces.Users;
 using Application.Utilities.Dto;
 using Application.Wrappers.Results;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.UseCases.Users.Commands;
 
@@ -16,10 +18,15 @@ public record class UpdateUserCommand : IRequest<Result<UserDto>>
 public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result<UserDto>>
 {
     private readonly IUsersRepository _usersRepository;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    public UpdateUserCommandHandler(IUsersRepository usersRepository)
+    public UpdateUserCommandHandler(
+        IUsersRepository usersRepository,
+        IPasswordHasher<User> passwordHasher
+    )
     {
         _usersRepository = usersRepository;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<Result<UserDto>> Handle(
@@ -36,12 +43,32 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
         }
 
         var updateUserDto = request.UpdateCommand;
-        var updatedUserModel = DtoUtilities.Map(
-            existingUser,
-            updateUserDto,
-            new DtoMapOptions() { IgnoreNull = true }
-        );
-        var updatedUserRecord = await _usersRepository.Update(updatedUserModel);
+
+        if (updateUserDto.Email is not null)
+        {
+            existingUser.Email = updateUserDto.Email;
+        }
+
+        if (updateUserDto.FirstName is not null)
+        {
+            existingUser.FirstName = updateUserDto.FirstName;
+        }
+
+        if (updateUserDto.LastName is not null)
+        {
+            existingUser.LastName = updateUserDto.LastName;
+        }
+
+        if (updateUserDto.Password is not null)
+        {
+            string hashedPassword = _passwordHasher.HashPassword(
+                existingUser,
+                updateUserDto.Password
+            );
+            existingUser.Password = hashedPassword;
+        }
+
+        var updatedUserRecord = await _usersRepository.Update(existingUser);
 
         var updatedUserDto = new UserDto()
         {
