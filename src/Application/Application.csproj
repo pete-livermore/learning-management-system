@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="Dtos/Response/" />
+    <Folder Include="Interfaces/Auth/" />
     <Folder Include="Services/CourseEnrolments/" />
     <Folder Include="UseCases/Users/Validators/" />
   </ItemGroup>
