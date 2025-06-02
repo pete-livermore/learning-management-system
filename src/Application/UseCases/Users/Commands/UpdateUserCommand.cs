@@ -23,11 +23,11 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
     }
 
     public async Task<Result<UserDto>> Handle(
-        UpdateUserCommand query,
+        UpdateUserCommand request,
         CancellationToken cancellationToken
     )
     {
-        var userId = query.UserId;
+        var userId = request.UserId;
         var existingUser = await _usersRepository.FindById(userId);
 
         if (existingUser is null)
@@ -35,7 +35,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             return Result<UserDto>.Failure(UserErrors.NotFound(userId));
         }
 
-        var updateUserDto = query.UpdateCommand;
+        var updateUserDto = request.UpdateCommand;
         var updatedUserModel = DtoUtilities.Map(
             existingUser,
             updateUserDto,
