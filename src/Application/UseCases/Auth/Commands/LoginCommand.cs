@@ -1,7 +1,7 @@
+using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Token;
 using Application.Dtos.Auth;
-using Application.Errors;
-using Application.Interfaces.Auth;
-using Application.Interfaces.Users;
+using Application.UseCases.Auth.Errors;
 using Application.Wrappers.Results;
 using Domain.Entities;
 using MediatR;

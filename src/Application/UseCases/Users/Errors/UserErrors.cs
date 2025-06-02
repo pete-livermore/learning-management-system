@@ -1,4 +1,6 @@
-namespace Application.Errors
+using Application.Common.Errors;
+
+namespace Application.UseCases.Users.Errors
 {
     public static class UserErrors
     {

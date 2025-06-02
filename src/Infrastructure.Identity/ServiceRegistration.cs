@@ -1,4 +1,5 @@
 using System.Text;
+using Application.Common.Interfaces.Token;
 using Application.Interfaces.Auth;
 using Domain.Entities;
 using Infrastructure.Identity.Services;

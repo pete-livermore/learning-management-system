@@ -1,5 +1,5 @@
-using Application.Errors;
-using Application.Interfaces.Users;
+using Application.Common.Interfaces.Repositories;
+using Application.UseCases.Users.Errors;
 using Application.Wrappers.Results;
 using MediatR;
 

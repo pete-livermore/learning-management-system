@@ -1,9 +1,6 @@
-using System;
-using System.Text.Json;
-using Application.Dtos;
-using Application.Dtos.User;
-using Application.Errors;
-using Application.Interfaces.Users;
+using Application.Common.Dtos;
+using Application.Common.Interfaces.Repositories;
+using Application.UseCases.Users.Dtos;
 using Application.Wrappers.Results;
 using MediatR;
 

@@ -1,8 +1,8 @@
 using System.Net.Mime;
-using Application.Dtos;
-using Application.Dtos.User;
-using Application.Errors;
+using Application.Common.Dtos;
 using Application.UseCases.Users.Commands;
+using Application.UseCases.Users.Dtos;
+using Application.UseCases.Users.Errors;
 using Application.UseCases.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

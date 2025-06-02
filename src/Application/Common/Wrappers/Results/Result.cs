@@ -1,4 +1,4 @@
-using Application.Errors;
+using Application.Common.Errors;
 
 namespace Application.Wrappers.Results;
 

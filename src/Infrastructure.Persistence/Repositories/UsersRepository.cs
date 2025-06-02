@@ -1,6 +1,6 @@
-using Application.Dtos;
-using Application.Dtos.User;
-using Application.Interfaces.Users;
+using Application.Common.Dtos;
+using Application.Common.Interfaces.Repositories;
+using Application.UseCases.Users.Dtos;
 using Domain.Entities;
 using Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
