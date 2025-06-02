@@ -57,6 +57,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             FirstName = createdUserRecord.FirstName,
             LastName = createdUserRecord.LastName,
             Role = createdUserRecord.Role.ToString(),
+            Id = createdUserRecord.Id,
         };
 
         return Result<UserDto>.Success(newUserDto);
