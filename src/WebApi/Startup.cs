@@ -18,6 +18,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddConfigOptions(Configuration);
         services.AddApplicationLayer();
         services.AddPersistenceInfrastructure(Configuration);
         services.AddSharedInfrastructure(Configuration);
@@ -32,6 +33,8 @@ public class Startup
     {
         app.UsePathBase(new PathString("/api"));
         app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseExceptionHandler();
         app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
