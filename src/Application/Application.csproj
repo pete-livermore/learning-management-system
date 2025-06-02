@@ -11,15 +11,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="MediatR.Extensions.FluentValidation.AspNetCore" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common/Behaviours/" />
+    <Folder Include="Common/Errors/" />
     <Folder Include="Dtos/Response/" />
     <Folder Include="Interfaces/Auth/" />
     <Folder Include="Services/CourseEnrolments/" />
+    <Folder Include="UseCases/Auth/Commands/" />
+    <Folder Include="UseCases/Auth/Dtos/" />
+    <Folder Include="UseCases/Auth/Errors/" />
+    <Folder Include="UseCases/Users/Dtos/" />
     <Folder Include="UseCases/Users/Validators/" />
   </ItemGroup>
 
