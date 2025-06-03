@@ -1,13 +1,13 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Token;
-using Application.Dtos.Auth;
-using Application.UseCases.Auth.Errors;
+using Application.UseCases.Security.Dtos;
+using Application.UseCases.Security.Errors;
 using Application.Wrappers.Results;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Application.UseCases.Auth.Commands;
+namespace Application.UseCases.Security.Commands;
 
 public record class LoginCommand : IRequest<Result<string>>
 {
@@ -37,23 +37,23 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
         CancellationToken cancellationToken
     )
     {
-        string loginEmail = request.Email;
-        string loginPassword = request.Password;
-        var user = await _usersRepository.FindByEmail(loginEmail);
+        string suppliedEmail = request.Email;
+        string suppliedPassword = request.Password;
+        var user = await _usersRepository.FindByEmail(suppliedEmail);
 
         if (user is null)
         {
-            return Result<string>.Failure(AuthErrors.InvalidUser(loginEmail));
+            return Result<string>.Failure(SecurityErrors.InvalidUser(suppliedEmail));
         }
         var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
             user,
             user.Password,
-            request.Password
+            suppliedPassword
         );
 
         if (passwordVerificationResult == PasswordVerificationResult.Failed)
         {
-            return Result<string>.Failure(AuthErrors.InvalidPassword(loginEmail, loginPassword));
+            return Result<string>.Failure(SecurityErrors.InvalidPassword(suppliedEmail));
         }
 
         string token = _tokenService.Generate(
