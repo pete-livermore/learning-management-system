@@ -3,6 +3,7 @@ using Application.UseCases.Users.Dtos;
 using Application.UseCases.Users.Errors;
 using Application.Wrappers.Results;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -45,7 +46,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             Email = createUserDto.Email,
             FirstName = createUserDto.FirstName,
             LastName = createUserDto.LastName,
-            Role = createUserDto.Role,
+            Role = Enum.Parse<UserRole>(createUserDto.Role),
             Password = "",
         };
         newUser.Password = _passwordHasher.HashPassword(newUser, createUserDto.Password);
