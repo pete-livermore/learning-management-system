@@ -43,7 +43,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
 
         if (user is null)
         {
-            return Result<string>.Failure(SecurityErrors.InvalidUser(suppliedEmail));
+            return Result<string>.Failure(SecurityErrors.Unauthorized());
         }
         var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
             user,
@@ -53,7 +53,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
 
         if (passwordVerificationResult == PasswordVerificationResult.Failed)
         {
-            return Result<string>.Failure(SecurityErrors.InvalidPassword(suppliedEmail));
+            return Result<string>.Failure(SecurityErrors.Unauthorized());
         }
 
         string token = _tokenService.Generate(
