@@ -1,7 +1,10 @@
 using Application.Common.Interfaces.Repositories;
+using Application.UseCases.Security.Errors;
+using Application.UseCases.Security.Interfaces;
 using Application.UseCases.Users.Dtos;
 using Application.UseCases.Users.Errors;
 using Application.Wrappers.Results;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.UseCases.Users.Queries;
@@ -14,10 +17,12 @@ public record GetUserByIdQuery : IRequest<Result<UserDto>>
 public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
 {
     private readonly IUsersRepository _usersRepository;
+    private readonly IUserAccessor _userAccessor;
 
-    public GetUserByIdQueryHandler(IUsersRepository usersRepository)
+    public GetUserByIdQueryHandler(IUsersRepository usersRepository, IUserAccessor userAccessor)
     {
         _usersRepository = usersRepository;
+        _userAccessor = userAccessor;
     }
 
     public async Task<Result<UserDto>> Handle(
@@ -26,6 +31,13 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<
     )
     {
         var userId = request.UserId;
+        var currentUser = _userAccessor.GetCurrentUser();
+
+        if (currentUser.Role != UserRole.Admin && currentUser.Id != userId)
+        {
+            return Result<UserDto>.Failure(SecurityErrors.Forbidden());
+        }
+
         var user = await _usersRepository.FindById(userId);
 
         if (user is null)
