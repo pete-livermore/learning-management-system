@@ -20,14 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common/Behaviours/" />
     <Folder Include="Common/Errors/" />
+    <Folder Include="Common/Interfaces/Security/" />
     <Folder Include="Dtos/Response/" />
     <Folder Include="Interfaces/Auth/" />
     <Folder Include="Services/CourseEnrolments/" />
-    <Folder Include="UseCases/Auth/Commands/" />
-    <Folder Include="UseCases/Auth/Dtos/" />
-    <Folder Include="UseCases/Auth/Errors/" />
     <Folder Include="UseCases/Users/Dtos/" />
     <Folder Include="UseCases/Users/Validators/" />
   </ItemGroup>

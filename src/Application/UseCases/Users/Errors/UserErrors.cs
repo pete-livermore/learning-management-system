@@ -4,26 +4,21 @@ namespace Application.UseCases.Users.Errors
 {
     public static class UserErrors
     {
-        public enum Code
-        {
-            NotFound,
-            Conflict,
-            Unauthorized,
-        }
+        private const string ErrorContext = "Users";
+
+        public const string NotFoundCode = $"{ErrorContext}.NotFound";
+        public const string ConflictCode = $"{ErrorContext}.Conflict";
+        public const string UnexpectedCode = $"{ErrorContext}.Unexpected";
 
         public static Error NotFound(int id) =>
-            new(Code.NotFound.ToString(), $"The user with Id '{id}' was not found");
+            new(NotFoundCode, $"The user with Id '{id}' was not found");
 
         public static Error NotFound(string email) =>
-            new(Code.NotFound.ToString(), $"The user with email '{email}' was not found");
+            new(NotFoundCode, $"The user with email '{email}' was not found");
 
         public static Error Conflict(string email) =>
-            new(Code.Conflict.ToString(), $"The user with email '{email}' already exists");
+            new(ConflictCode, $"The user with email '{email}' already exists");
 
-        public static Error Unauthorized() =>
-            new(
-                Code.Unauthorized.ToString(),
-                $"The current user is not authorised to access this resource"
-            );
+        public static Error Unexpected(string message) => new(UnexpectedCode, message);
     }
 }

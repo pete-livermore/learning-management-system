@@ -1,4 +1,4 @@
-namespace Application.Dtos.Auth
+namespace Application.UseCases.Security.Dtos
 {
     public record TokenDataDto
     {

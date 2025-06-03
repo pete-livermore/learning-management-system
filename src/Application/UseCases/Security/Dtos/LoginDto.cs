@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Dtos.Auth
+namespace Application.UseCases.Security.Dtos
 {
     public record LoginDto
     {
