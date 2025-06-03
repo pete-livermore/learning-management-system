@@ -40,9 +40,9 @@ namespace WebApi.v1.Controllers
 
             if (result.IsFailure)
             {
-                return Enum.Parse<UserErrors.Code>(result.Error.Code) switch
+                return result.Error.Code switch
                 {
-                    UserErrors.Code.Conflict => Conflict(result.Error),
+                    UserErrors.ConflictCode => Conflict(result.Error),
                     _ => GenericErrorResponse(),
                 };
             }
@@ -82,9 +82,9 @@ namespace WebApi.v1.Controllers
             var result = await _mediator.Send(new GetUserByIdQuery() { UserId = id });
             if (result.IsFailure)
             {
-                return Enum.Parse<UserErrors.Code>(result.Error.Code) switch
+                return result.Error.Code switch
                 {
-                    UserErrors.Code.NotFound => NotFound(result.Error),
+                    UserErrors.NotFoundCode => NotFound(result.Error),
                     _ => GenericErrorResponse(),
                 };
             }
@@ -105,9 +105,9 @@ namespace WebApi.v1.Controllers
 
             if (result.IsFailure)
             {
-                return Enum.Parse<UserErrors.Code>(result.Error.Code) switch
+                return result.Error.Code switch
                 {
-                    UserErrors.Code.NotFound => NotFound(result.Error),
+                    UserErrors.NotFoundCode => NotFound(result.Error),
                     _ => GenericErrorResponse(),
                 };
             }
@@ -127,9 +127,9 @@ namespace WebApi.v1.Controllers
 
             if (result.IsFailure)
             {
-                return Enum.Parse<UserErrors.Code>(result.Error.Code) switch
+                return result.Error.Code switch
                 {
-                    UserErrors.Code.NotFound => NotFound(),
+                    UserErrors.NotFoundCode => NotFound(),
                     _ => GenericErrorResponse(),
                 };
             }
@@ -147,7 +147,7 @@ namespace WebApi.v1.Controllers
             {
                 return deleteUserResult.Error.Code switch
                 {
-                    "Users.NotFound" => NotFound(deleteUserResult.Error),
+                    UserErrors.NotFoundCode => NotFound(deleteUserResult.Error),
                     _ => GenericErrorResponse(),
                 };
             }
