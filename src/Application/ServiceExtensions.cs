@@ -1,5 +1,6 @@
 namespace Application
 {
+    using Application.Common.Behaviours;
     using FluentValidation;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -7,9 +8,10 @@ namespace Application
     {
         public static void AddApplicationLayer(this IServiceCollection services)
         {
-            services.AddMediatR(options =>
+            services.AddMediatR(cfg =>
             {
-                options.RegisterServicesFromAssembly(typeof(ServiceExtensions).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(ServiceExtensions).Assembly);
+                cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
             });
 
             services.AddValidatorsFromAssemblyContaining(typeof(ServiceExtensions));
