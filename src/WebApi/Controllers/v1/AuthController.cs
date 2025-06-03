@@ -1,5 +1,6 @@
-using Application.Dtos.Auth;
-using Application.UseCases.Auth.Commands;
+using Application.UseCases.Security.Commands;
+using Application.UseCases.Security.Dtos;
+using Application.UseCases.Security.Errors;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +27,14 @@ namespace WebApi.Controllers.V1
 
             if (loginResult.IsFailure)
             {
-                return Unauthorized();
+                if (
+                    loginResult.Error.Code == SecurityErrors.InvalidUserCode
+                    || loginResult.Error.Code == SecurityErrors.InvalidPasswordCode
+                )
+                {
+                    return Unauthorized();
+                }
+                return StatusCode(500, "There was an unexpected authentication error");
             }
 
             return Ok(new { Token = loginResult.Value });

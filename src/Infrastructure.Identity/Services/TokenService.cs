@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Application.Common.Interfaces.Token;
-using Application.Dtos.Auth;
+using Application.UseCases.Security.Dtos;
 using LearningManagementSystem.Infrastructure.Identity.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

@@ -1,5 +1,5 @@
-using Application.Dtos.Auth;
-using Application.Interfaces.Auth;
+using Application.UseCases.Security.Dtos;
+using Application.UseCases.Security.Interfaces;
 using Domain.Enums;
 using Infrastructure.Identity.Extensions;
 using Microsoft.AspNetCore.Http;

@@ -1,6 +1,6 @@
 using System.Text;
 using Application.Common.Interfaces.Token;
-using Application.Interfaces.Auth;
+using Application.UseCases.Security.Interfaces;
 using Domain.Entities;
 using Infrastructure.Identity.Services;
 using LearningManagementSystem.Infrastructure.Identity.Configuration;
@@ -49,7 +49,9 @@ public static class ServiceRegistration
                 }
             );
 
+        services.AddHttpContextAccessor();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IUserAccessor, UserAccessor>();
     }
 }
