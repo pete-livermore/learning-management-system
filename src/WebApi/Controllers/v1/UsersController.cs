@@ -1,13 +1,14 @@
 using System.Net.Mime;
+using System.Text.Json;
 using Application.Common.Dtos;
 using Application.UseCases.Users.Commands;
 using Application.UseCases.Users.Dtos;
-using Application.UseCases.Users.Errors;
 using Application.UseCases.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Controllers.v1;
 
 namespace WebApi.v1.Controllers
 {
@@ -15,17 +16,16 @@ namespace WebApi.v1.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("v{version:apiVersion}/[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController : ApiController
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(IMediator mediator)
+        public UsersController(IMediator mediator, ILogger<UsersController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
-
-        private ObjectResult GenericErrorResponse() =>
-            StatusCode(500, new { message = "An unexpected error occurred." });
 
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -34,20 +34,18 @@ namespace WebApi.v1.Controllers
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] CreateUserDto createUserDto)
         {
-            var result = await _mediator.Send(
+            var createResult = await _mediator.Send(
                 new CreateUserCommand() { CreateCommand = createUserDto }
             );
 
-            if (result.IsFailure)
+            _logger.LogWarning("Create result: @{createResult}", createResult);
+
+            if (createResult.IsFailure)
             {
-                return result.Error.Code switch
-                {
-                    UserErrors.ConflictCode => Conflict(result.Error),
-                    _ => GenericErrorResponse(),
-                };
+                return Problem(createResult.Errors);
             }
 
-            var newUser = result.Value;
+            var newUser = createResult.Value;
             return CreatedAtAction(nameof(Create), new { id = newUser.Id }, newUser);
         }
 
@@ -64,32 +62,28 @@ namespace WebApi.v1.Controllers
                 PageSize = query.Pages ?? 30,
             };
 
-            var findUsersResult = await _mediator.Send(
+            var getUsersResult = await _mediator.Send(
                 new GetUsersQuery() { Filters = filters, Pagination = paginationParams }
             );
 
-            if (findUsersResult.IsFailure)
+            if (getUsersResult.IsFailure)
             {
-                return GenericErrorResponse();
+                return Problem(getUsersResult.Errors);
             }
 
-            return new ApiResponse(findUsersResult.Value);
+            return new ApiResponse(getUsersResult.Value);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse>> GetById(int id)
         {
-            var result = await _mediator.Send(new GetUserByIdQuery() { UserId = id });
-            if (result.IsFailure)
+            var getByIdResult = await _mediator.Send(new GetUserByIdQuery() { UserId = id });
+            if (getByIdResult.IsFailure)
             {
-                return result.Error.Code switch
-                {
-                    UserErrors.NotFoundCode => NotFound(result.Error),
-                    _ => GenericErrorResponse(),
-                };
+                return Problem(getByIdResult.Errors);
             }
 
-            return new ApiResponse(result.Value);
+            return new ApiResponse(getByIdResult.Value);
         }
 
         [Consumes(MediaTypeNames.Application.Json)]
@@ -99,17 +93,13 @@ namespace WebApi.v1.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-            var result = await _mediator.Send(
+            var updateResult = await _mediator.Send(
                 new UpdateUserCommand() { UserId = id, UpdateCommand = updateUserDto }
             );
 
-            if (result.IsFailure)
+            if (updateResult.IsFailure)
             {
-                return result.Error.Code switch
-                {
-                    UserErrors.NotFoundCode => NotFound(result.Error),
-                    _ => GenericErrorResponse(),
-                };
+                return Problem(updateResult.Errors);
             }
             return NoContent();
         }
@@ -121,19 +111,15 @@ namespace WebApi.v1.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Replace(int id, [FromBody] ReplaceUserDto replaceUserDto)
         {
-            var result = await _mediator.Send(
+            var replaceResult = await _mediator.Send(
                 new ReplaceUserCommand() { UserId = id, ReplaceCommand = replaceUserDto }
             );
 
-            if (result.IsFailure)
+            if (replaceResult.IsFailure)
             {
-                return result.Error.Code switch
-                {
-                    UserErrors.NotFoundCode => NotFound(),
-                    _ => GenericErrorResponse(),
-                };
+                return Problem(replaceResult.Errors);
             }
-            return CreatedAtAction(nameof(Replace), new { id }, result.Value);
+            return CreatedAtAction(nameof(Replace), new { id }, replaceResult.Value);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -141,15 +127,11 @@ namespace WebApi.v1.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var deleteUserResult = await _mediator.Send(new DeleteUserCommand() { UserId = id });
+            var deleteResult = await _mediator.Send(new DeleteUserCommand() { UserId = id });
 
-            if (!deleteUserResult.IsFailure)
+            if (!deleteResult.IsFailure)
             {
-                return deleteUserResult.Error.Code switch
-                {
-                    UserErrors.NotFoundCode => NotFound(deleteUserResult.Error),
-                    _ => GenericErrorResponse(),
-                };
+                return Problem(deleteResult.Errors);
             }
 
             return NoContent();

@@ -1,15 +1,15 @@
 using Application.UseCases.Security.Commands;
 using Application.UseCases.Security.Dtos;
-using Application.UseCases.Security.Errors;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Controllers.v1;
 
 namespace WebApi.Controllers.V1
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("v{version:apiVersion}/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiController
     {
         private readonly IMediator _mediator;
 
@@ -27,14 +27,7 @@ namespace WebApi.Controllers.V1
 
             if (loginResult.IsFailure)
             {
-                if (
-                    loginResult.Error.Code == SecurityErrors.InvalidUserCode
-                    || loginResult.Error.Code == SecurityErrors.InvalidPasswordCode
-                )
-                {
-                    return Unauthorized();
-                }
-                return StatusCode(500, "There was an unexpected authentication error");
+                return Problem(loginResult.Errors);
             }
 
             return Ok(new { Token = loginResult.Value });
