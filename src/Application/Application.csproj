@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common/Errors/" />
     <Folder Include="Common/Interfaces/Security/" />
     <Folder Include="Dtos/Response/" />
     <Folder Include="Interfaces/Auth/" />
