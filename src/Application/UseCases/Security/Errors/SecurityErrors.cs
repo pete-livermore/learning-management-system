@@ -17,7 +17,7 @@ public static class SecurityErrors
 
     public static Error Forbidden() =>
         new(
-            ErrorType.Unauthorized,
+            ErrorType.Forbidden,
             ForbiddenCode,
             $"The current user does not have permission to perform this action"
         );
