@@ -8,7 +8,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
-namespace Application.UnitTests;
+namespace Application.UnitTests.UseCases.Users.Commands;
 
 public class CreateUserCommandTests
 {
@@ -21,13 +21,16 @@ public class CreateUserCommandTests
         _passwordHasherMock = new Mock<IPasswordHasher<User>>();
     }
 
-    [Fact]
-    public async Task Create_ShouldReturnConflict_WhenUserAlreadyExists()
+    private CreateUserCommandHandler CreateHandler()
     {
-        var handler = new CreateUserCommandHandler(
-            _repositoryMock.Object,
-            _passwordHasherMock.Object
-        );
+        return new CreateUserCommandHandler(_repositoryMock.Object, _passwordHasherMock.Object);
+    }
+
+    [Fact]
+    public async Task ShouldReturnConflict_WhenUserAlreadyExists()
+    {
+        var handler = CreateHandler();
+
         var testDto = new CreateUserDto()
         {
             FirstName = "test",
@@ -59,12 +62,10 @@ public class CreateUserCommandTests
     }
 
     [Fact]
-    public async Task Create_ShouldReturnSuccess_WhenUserIsValid()
+    public async Task ShouldReturnSuccess_WhenUserIsValid()
     {
-        var handler = new CreateUserCommandHandler(
-            _repositoryMock.Object,
-            _passwordHasherMock.Object
-        );
+        var handler = CreateHandler();
+
         var testDto = new CreateUserDto()
         {
             Email = "test@example.com",
@@ -95,6 +96,7 @@ public class CreateUserCommandTests
 
         var result = await handler.Handle(command, new CancellationToken());
 
+        _repositoryMock.Verify(r => r.Add(It.IsAny<User>()), Times.Once);
         Assert.True(result.IsSuccess);
     }
 }
