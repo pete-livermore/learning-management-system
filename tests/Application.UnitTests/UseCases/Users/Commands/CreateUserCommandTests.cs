@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Application.Common.Errors;
 using Application.Common.Interfaces.Repositories;
 using Application.UseCases.Users.Commands;
@@ -12,14 +11,8 @@ namespace Application.UnitTests.UseCases.Users.Commands;
 
 public class CreateUserCommandTests
 {
-    private readonly Mock<IUsersRepository> _repositoryMock;
-    private readonly Mock<IPasswordHasher<User>> _passwordHasherMock;
-
-    public CreateUserCommandTests()
-    {
-        _repositoryMock = new Mock<IUsersRepository>();
-        _passwordHasherMock = new Mock<IPasswordHasher<User>>();
-    }
+    private readonly Mock<IUsersRepository> _repositoryMock = new();
+    private readonly Mock<IPasswordHasher<User>> _passwordHasherMock = new();
 
     private CreateUserCommandHandler CreateHandler()
     {
