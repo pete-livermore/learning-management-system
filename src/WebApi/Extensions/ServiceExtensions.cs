@@ -1,3 +1,5 @@
+using Application.Common.Configuration;
+using Infrastructure.Uploads.Configuration;
 using LearningManagementSystem.Infrastructure.Identity.Configuration;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +12,18 @@ public static class ServiceExtensions
         services
             .AddOptions<SecurityOptions>()
             .Bind(config.GetSection(SecurityOptions.Security))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services
+            .AddOptions<UploadOptions>()
+            .Bind(config.GetSection(UploadOptions.Uploads))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services
+            .AddOptions<CloudinaryOptions>()
+            .Bind(config.GetSection(CloudinaryOptions.Cloudinary))
             .ValidateDataAnnotations()
             .ValidateOnStart();
     }
