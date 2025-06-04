@@ -19,5 +19,6 @@ public static class ServiceRegistration
         );
 
         services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IFilesRepository, FilesRepository>();
     }
 }
