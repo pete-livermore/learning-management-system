@@ -1,12 +1,11 @@
 using Domain.Enums;
 using FluentValidation;
-using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases.Users.Commands;
 
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
-    public CreateUserCommandValidator(ILogger<CreateUserCommandValidator> logger)
+    public CreateUserCommandValidator()
     {
         RuleFor(c => c.CreateCommand)
             .NotNull()
