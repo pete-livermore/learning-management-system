@@ -24,6 +24,8 @@
     <Folder Include="Dtos/Response/" />
     <Folder Include="Interfaces/Auth/" />
     <Folder Include="Services/CourseEnrolments/" />
+    <Folder Include="UseCases/Uploads/Dtos/" />
+    <Folder Include="UseCases/Uploads/Interfaces/" />
     <Folder Include="UseCases/Users/Dtos/" />
     <Folder Include="UseCases/Users/Validators/" />
   </ItemGroup>
