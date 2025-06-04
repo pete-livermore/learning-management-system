@@ -1,5 +1,4 @@
 using Domain.Entities;
-using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Contexts
@@ -12,6 +11,7 @@ namespace Infrastructure.Persistence.Contexts
             : base(options) { }
 
         public required DbSet<User> Users { get; set; }
+        public required DbSet<UploadFile> Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
