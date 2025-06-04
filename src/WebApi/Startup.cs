@@ -4,6 +4,7 @@ using Application;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Shared;
+using Infrastructure.Uploads;
 using WebApi.Extensions;
 using WebApi.Services;
 
@@ -23,6 +24,7 @@ public class Startup
         services.AddPersistenceInfrastructure(Configuration);
         services.AddSharedInfrastructure(Configuration);
         services.AddIdentityInfrastructure(Configuration);
+        services.AddUploadsInfrastructure();
         services.AddControllers();
         services.AddApiVersioningExtension();
         services.AddExceptionHandler<GlobalExceptionHandler>();
