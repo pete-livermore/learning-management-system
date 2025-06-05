@@ -34,7 +34,10 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Result<Pagina
         var pagination = query.Pagination;
         var filtersString = JsonSerializer.Serialize(filters);
         var cacheKey = $"Users_{filtersString}";
-        var cachedUsersList = await _cacheService.GetValueAsync<PaginatedList<UserDto>>(cacheKey);
+        var cachedUsersList = await _cacheService.GetValueAsync<PaginatedList<UserDto>>(
+            cacheKey,
+            cancellationToken
+        );
 
         if (cachedUsersList is not null)
         {
