@@ -1,10 +1,13 @@
+using Application.Common.Dtos;
 using Application.Common.Interfaces.Repositories;
+using Application.UseCases.Security.Errors;
+using Application.UseCases.Security.Interfaces;
 using Application.UseCases.Uploads.Dtos;
 using Application.UseCases.Uploads.Errors;
+using Application.UseCases.Uploads.Helpers;
 using Application.UseCases.Uploads.Interfaces;
 using Application.Wrappers.Results;
 using Domain.Entities;
-using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
@@ -12,7 +15,6 @@ namespace Application.UseCases.Uploads.Commands;
 
 public record CreateFileCommand : IRequest<Result<FileDto>>
 {
-    public required CreateFileDto CreateCommand { get; init; }
     public required IFormFile FileContent { get; init; }
     public FileMetadataDto? FileMetadata { get; init; }
 }
@@ -21,14 +23,17 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
 {
     private readonly IUploadsService _uploadsService;
     private readonly IFilesRepository _filesRepository;
+    private readonly IUserAccessor _userAccessor;
 
     public CreateFileCommandHandler(
         IFilesRepository filesRepository,
-        IUploadsService uploadsService
+        IUploadsService uploadsService,
+        IUserAccessor userAccessor
     )
     {
         _filesRepository = filesRepository;
         _uploadsService = uploadsService;
+        _userAccessor = userAccessor;
     }
 
     public async Task<Result<FileDto>> Handle(
@@ -36,26 +41,36 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
         CancellationToken cancellationToken
     )
     {
-        var createFileDto = command.CreateCommand;
+        var file = command.FileContent;
+        var fileMetadata = command.FileMetadata;
+        bool isValidFile = FileValidator.IsValidFile(file);
 
-        var uploadResult = await _uploadsService.Upload(command.FileContent, command.FileMetadata);
+        if (!isValidFile)
+        {
+            return Result<FileDto>.Failure(UploadErrors.Validation("Invalid file"));
+        }
+
+        string fileMimeType = file.ContentType;
+        var uploadResult = await _uploadsService.Upload(file, fileMetadata);
         var providerMetadata = uploadResult.ProviderMetadata;
         string providerId = providerMetadata.Id;
-
-        if (Enum.TryParse<UploadResourceType>(createFileDto.ResourceType, out var resourceType))
-        {
-            return Result<FileDto>.Failure(UploadErrors.Validation("Invalid resource type"));
-        }
         ;
+        var authenticatedUser = _userAccessor.GetCurrentUser();
+
+        if (authenticatedUser == null)
+        {
+            return Result<FileDto>.Failure(SecurityErrors.Unauthorized());
+        }
+
+        string fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
         UploadFile newFileRecord = new()
         {
             Url = uploadResult.Url,
-            Mime = createFileDto.Mime,
-            ResourceType = resourceType,
-            Ext = createFileDto.Ext,
+            Mime = fileMimeType,
+            Ext = fileExtension,
             ProviderId = providerId,
-            OwnerId = createFileDto.OwnerId,
+            OwnerId = authenticatedUser.Id,
         };
 
         await _filesRepository.Add(newFileRecord);
@@ -65,9 +80,8 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
             Url = newFileRecord.Url,
             Mime = newFileRecord.Mime,
             Ext = newFileRecord.Ext,
-            Owner = new FileOwnerDto { Id = newFileRecord.OwnerId },
+            Owner = new EntityOwnerDto { Id = newFileRecord.OwnerId },
             ProviderId = newFileRecord.ProviderId,
-            ResourceType = newFileRecord.ResourceType.ToString(),
             CreatedAt = newFileRecord.CreatedAt,
             UpdatedAt = newFileRecord.CreatedAt,
         };
