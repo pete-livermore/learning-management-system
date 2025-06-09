@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Application.UseCases.Uploads.Helpers;
 
-public static class FileValidator
+public class FileValidator
 {
     public static readonly Dictionary<string, List<byte[]>> AllowedFiles = new()
     {
@@ -64,7 +64,7 @@ public static class FileValidator
         }
     }
 
-    public static bool IsValidFile(IFormFile file)
+    public bool IsValidFile(IFormFile file)
     {
         string fileName = file.FileName;
         string extension = Path.GetExtension(fileName).ToLowerInvariant();
