@@ -21,16 +21,19 @@ public record CreateFileCommand : IRequest<Result<FileDto>>
 
 public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Result<FileDto>>
 {
+    private readonly IFileValidator _fileValidator;
     private readonly IUploadsService _uploadsService;
     private readonly IFilesRepository _filesRepository;
     private readonly IUserAccessor _userAccessor;
 
     public CreateFileCommandHandler(
+        IFileValidator fileValidator,
         IFilesRepository filesRepository,
         IUploadsService uploadsService,
         IUserAccessor userAccessor
     )
     {
+        _fileValidator = fileValidator;
         _filesRepository = filesRepository;
         _uploadsService = uploadsService;
         _userAccessor = userAccessor;
@@ -43,7 +46,7 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
     {
         var file = command.FileContent;
         var fileMetadata = command.FileMetadata;
-        bool isValidFile = FileValidator.IsValidFile(file);
+        bool isValidFile = _fileValidator.IsValidFile(file);
 
         if (!isValidFile)
         {
