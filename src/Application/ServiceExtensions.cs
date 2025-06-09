@@ -18,12 +18,6 @@ namespace Application
             });
 
             services.AddValidatorsFromAssemblyContaining(typeof(ServiceExtensions));
-
-            services.AddTransient<IValidator<CreateFileCommand>>(sp =>
-            {
-                var options = sp.GetRequiredService<IOptions<UploadOptions>>();
-                return new CreateFileCommandValidator(options);
-            });
         }
     }
 }
