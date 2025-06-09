@@ -1,5 +1,3 @@
-using Domain.Enums;
-
 namespace Domain.Entities
 {
     public class UploadFile : BaseEntity
