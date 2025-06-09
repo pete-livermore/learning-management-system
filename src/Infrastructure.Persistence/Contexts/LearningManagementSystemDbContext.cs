@@ -12,6 +12,8 @@ namespace Infrastructure.Persistence.Contexts
 
         public required DbSet<User> Users { get; set; }
         public required DbSet<UploadFile> Files { get; set; }
+        public required DbSet<Lesson> Lessons { get; set; }
+        public required DbSet<LessonContent> LessonContents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
