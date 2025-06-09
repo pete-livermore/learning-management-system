@@ -6,12 +6,8 @@ namespace Application.UseCases.Uploads.Commands;
 
 public class CreateFileCommandValidator : AbstractValidator<CreateFileCommand>
 {
-    private readonly UploadOptions _uploadOptions;
-
-    public CreateFileCommandValidator(IOptions<UploadOptions> uploadOptions)
+    public CreateFileCommandValidator()
     {
-        _uploadOptions = uploadOptions.Value;
-
         RuleFor(c => c.FileContent)
             .NotNull()
             .DependentRules(() =>
