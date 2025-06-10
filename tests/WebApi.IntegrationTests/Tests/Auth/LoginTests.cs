@@ -44,7 +44,6 @@ public class LoginTests
         var response = await _client.PostAsync("/api/v1/auth/login", httpContent);
 
         string responseBody = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("Response Body: " + responseBody);
 
         try
         {
