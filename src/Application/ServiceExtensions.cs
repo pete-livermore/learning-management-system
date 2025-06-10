@@ -1,12 +1,9 @@
+using Application.Common.Behaviours;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Application
 {
-    using Application.Common.Behaviours;
-    using Application.Common.Configuration;
-    using Application.UseCases.Uploads.Commands;
-    using FluentValidation;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
-
     public static class ServiceExtensions
     {
         public static void AddApplicationLayer(this IServiceCollection services)
