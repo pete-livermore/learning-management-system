@@ -30,8 +30,8 @@ services:
     command: /opt/mssql-init/init-db.sh
     stdin_open: true
     volumes:
-      - ./src/LearningManagementSystem/Infrastructure/Database/init.sql:/opt/mssql-init/init.sql
-      - ./.scripts/mssql/init-db-in-container.sh:/opt/mssql-init/init-db.sh
+      - ./Scripts/CreateDatabase.sql:/opt/mssql-init/CreateDatabase.sql
+      - ./Scripts/init-db-in-container.sh:/opt/mssql-init/init-db.sh
     networks:
       - sql_network
 
