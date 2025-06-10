@@ -1,9 +1,10 @@
 using System.Text;
+using Application.UseCases.Uploads.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.UseCases.Uploads.Helpers;
 
-public class FileValidator
+public class FileValidator : IFileValidator
 {
     public static readonly Dictionary<string, List<byte[]>> AllowedFiles = new()
     {
