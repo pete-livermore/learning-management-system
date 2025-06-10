@@ -1,4 +1,6 @@
 using Application.Common.Behaviours;
+using Application.UseCases.Uploads.Helpers;
+using Application.UseCases.Uploads.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +17,7 @@ namespace Application
             });
 
             services.AddValidatorsFromAssemblyContaining(typeof(ServiceExtensions));
+            services.AddTransient<IFileValidator, FileValidator>();
         }
     }
 }
