@@ -15,8 +15,14 @@ public static class ServiceRegistration
     )
     {
         services.AddDbContext<LearningManagementSystemDbContext>(options =>
-            options.UseSqlServer(config.GetConnectionString("SqlServer"))
-        );
+        {
+            var sqlServerConnectionString =
+                config.GetConnectionString("SqlServer")
+                ?? throw new InvalidOperationException(
+                    "ConnectionStrings:SqlServer is missing or incomplete in environment"
+                );
+            options.UseSqlServer(sqlServerConnectionString);
+        });
 
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IFilesRepository, FilesRepository>();
