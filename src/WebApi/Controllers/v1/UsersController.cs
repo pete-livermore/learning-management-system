@@ -1,21 +1,18 @@
 using System.Net.Mime;
-using System.Text.Json;
 using Application.Common.Dtos;
 using Application.UseCases.Users.Commands;
 using Application.UseCases.Users.Dtos;
 using Application.UseCases.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.v1;
 
-namespace WebApi.v1.Controllers
+namespace WebApi.Controllers.v1
 {
     [Authorize]
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class UsersController : ApiController
     {
         private readonly IMediator _mediator;
