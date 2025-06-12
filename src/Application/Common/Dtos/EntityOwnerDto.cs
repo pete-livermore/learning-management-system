@@ -2,5 +2,5 @@ namespace Application.Common.Dtos;
 
 public record EntityOwnerDto
 {
-    public required int Id { get; init; }
+    public required string Id { get; init; }
 }
