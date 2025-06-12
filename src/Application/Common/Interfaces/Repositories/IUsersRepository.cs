@@ -6,13 +6,13 @@ namespace Application.Common.Interfaces.Repositories;
 
 public interface IUsersRepository
 {
-    Task<User> Add(User user);
-    Task<User?> FindById(int id);
-    Task<User?> FindByEmail(string email);
-    Task<(List<User>, int totalPages)> FindMany(
+    void Add(User user);
+    Task<User?> FindByIdAsync(int id);
+    Task<User?> FindByEmailAsync(string email);
+    Task<(List<User>, int totalPages)> FindManyAsync(
         UserFiltersDto? filters = null,
         PaginationParamsDto? pagination = null
     );
-    Task<User> Update(User userToUpdate);
-    Task Delete(User userToDelete);
+    void Update(User userToUpdate);
+    void Delete(User userToDelete);
 };

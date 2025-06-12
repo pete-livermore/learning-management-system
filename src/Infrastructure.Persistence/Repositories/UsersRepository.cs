@@ -22,19 +22,16 @@ namespace Infrastructure.Persistence.Repositories
             _logger = logger;
         }
 
-        public async Task<User> Add(User newUser)
+        public void Add(User newUser)
         {
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
-
-            return newUser;
+            _context.DomainUsers.Add(newUser);
         }
 
-        public async Task<User?> FindById(int id)
+        public async Task<User?> FindByIdAsync(int id)
         {
             try
             {
-                return await _context.Users.FindAsync(id);
+                return await _context.DomainUsers.FindAsync(id);
             }
             catch (Exception ex)
             {
@@ -43,17 +40,17 @@ namespace Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task<User?> FindByEmail(string email)
+        public async Task<User?> FindByEmailAsync(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<(List<User>, int totalPages)> FindMany(
+        public async Task<(List<User>, int totalPages)> FindManyAsync(
             UserFiltersDto? filters = null,
             PaginationParamsDto? pagination = null
         )
         {
-            var query = _context.Users.AsQueryable();
+            var query = _context.DomainUsers.AsQueryable();
 
             if (filters != null)
             {
@@ -87,19 +84,17 @@ namespace Infrastructure.Persistence.Repositories
             return (users, totalPages);
         }
 
-        public async Task<User> Update(User userToUpdate)
+        public void Update(User userToUpdate)
         {
+            // Alternatively, ythe DbContext could have an interceptor or overridden SaveChanges method
+            // to automatically set audit fields like CreatedAt/UpdatedAt.
             userToUpdate.UpdatedAt = DateTime.UtcNow;
-            _context.Users.Update(userToUpdate);
-            await _context.SaveChangesAsync();
-
-            return userToUpdate;
+            _context.DomainUsers.Update(userToUpdate);
         }
 
-        public async Task Delete(User userToDelete)
+        public void Delete(User userToDelete)
         {
-            _context.Users.Remove(userToDelete);
-            await _context.SaveChangesAsync();
+            _context.DomainUsers.Remove(userToDelete);
         }
     }
 }
