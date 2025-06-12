@@ -1,11 +1,11 @@
 using System.Text;
+using Application.Common.Interfaces.Security;
 using Application.Common.Interfaces.Token;
 using Application.UseCases.Security.Interfaces;
-using Domain.Entities;
+using Infrastructure.Identity.Models;
 using Infrastructure.Identity.Services;
 using LearningManagementSystem.Infrastructure.Identity.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -50,8 +50,8 @@ public static class ServiceRegistration
             );
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IUserAccessor, UserAccessor>();
+        services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
     }
 }
