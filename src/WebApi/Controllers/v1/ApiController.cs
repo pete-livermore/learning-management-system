@@ -1,22 +1,17 @@
 using Application.Common.Errors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace WebApi.Controllers.v1
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class ApiController : ControllerBase
     {
         protected ActionResult Problem(IReadOnlyList<Error> errors)
         {
-            if (errors.Any(err => err.Type == ErrorType.Validation))
-            {
-                return ValidationProblem(errors);
-            }
-
-            return Problem(errors[0]);
+            return errors.Any(err => err.Type == ErrorType.Validation)
+                ? ValidationProblem(errors)
+                : Problem(errors[0]);
         }
 
         private ObjectResult Problem(Error error)
