@@ -2,7 +2,7 @@ using Application.UseCases.Security.Dtos;
 
 namespace Application.UseCases.Security.Interfaces;
 
-public interface IUserAccessor
+public interface ICurrentUserProvider
 {
-    AuthenticatedUserDto GetCurrentUser();
+    CurrentUserDto GetCurrentUser();
 }
