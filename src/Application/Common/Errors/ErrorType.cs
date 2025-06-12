@@ -8,5 +8,7 @@ public enum ErrorType
     Conflict,
     Unexpected,
     Validation,
+    Concurrency,
+    Network,
     None,
 }
