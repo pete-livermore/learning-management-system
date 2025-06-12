@@ -2,9 +2,12 @@ namespace WebApi;
 
 using Application;
 using Infrastructure.Identity;
+using Infrastructure.Identity.Models;
 using Infrastructure.Persistence;
+using Infrastructure.Persistence.Contexts;
 using Infrastructure.Shared;
 using Infrastructure.Uploads;
+using Microsoft.AspNetCore.Identity;
 using WebApi.Extensions;
 using WebApi.Services;
 
@@ -22,8 +25,12 @@ public class Startup
         services.AddConfigOptions(Configuration);
         services.AddApplicationLayer();
         services.AddPersistenceInfrastructure(Configuration);
-        services.AddSharedInfrastructure(Configuration);
+        services
+            .AddIdentity<ApplicationUser, ApplicationRole>()
+            .AddEntityFrameworkStores<LearningManagementSystemDbContext>()
+            .AddDefaultTokenProviders();
         services.AddIdentityInfrastructure(Configuration);
+        services.AddSharedInfrastructure(Configuration);
         services.AddUploadsInfrastructure();
         services.AddControllers();
         services.AddApiVersioningExtension();
@@ -33,7 +40,6 @@ public class Startup
 
     public void Configure(IApplicationBuilder app)
     {
-        app.UsePathBase(new PathString("/api"));
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
