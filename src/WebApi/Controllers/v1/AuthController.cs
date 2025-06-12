@@ -2,9 +2,8 @@ using Application.UseCases.Security.Commands;
 using Application.UseCases.Security.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.v1;
 
-namespace WebApi.Controllers.V1
+namespace WebApi.Controllers.v1
 {
     [ApiController]
     [ApiVersion("1.0")]
