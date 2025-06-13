@@ -25,12 +25,13 @@ namespace Infrastructure.Identity.Services
             );
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, tokenData.Email),
-                new Claim(ClaimTypes.NameIdentifier, tokenData.UserId.ToString()),
-                new Claim(ClaimTypes.Role, tokenData.Role),
+                new(ClaimTypes.Name, tokenData.Email),
+                new(ClaimTypes.NameIdentifier, tokenData.UserId.ToString()),
             };
+
+            claims.AddRange(tokenData.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
             var token = new JwtSecurityToken(
                 issuer: _jwtConfig.Issuer,
