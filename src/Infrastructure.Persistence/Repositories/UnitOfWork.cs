@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Common.Errors;
-using Application.Common.Interfaces.Persistence;
+using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
 using Application.Wrappers.Results;
 using Infrastructure.Persistence.Contexts;
@@ -30,26 +30,21 @@ public class UnitOfWork : IUnitOfWork
             || innerMessage.Contains("duplicate entry")
         )
         {
-            return PersistenceErrors.Conflict();
+            return ResourceError.Conflict(ex.Message);
         }
         else if (
             innerMessage.Contains("FOREIGN KEY constraint")
             || innerMessage.Contains("REFERENCES constraint")
-        )
-        {
-            return PersistenceErrors.InvalidReference();
-        }
-        else if (
-            innerMessage.Contains("truncated")
+            || innerMessage.Contains("truncated")
             || innerMessage.Contains("NULL into column")
             || innerMessage.Contains("value too large")
         )
         {
-            return PersistenceErrors.DataIntegrity();
+            return ValidationError.InvalidInput(ex.Message);
         }
         else
         {
-            return PersistenceErrors.Unexpected(ex.Message);
+            return UnexpectedError.Unknown(ex.Message);
         }
     }
 
@@ -62,7 +57,7 @@ public class UnitOfWork : IUnitOfWork
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            return Result<int>.Failure(PersistenceErrors.Concurrency(ex.Message));
+            return Result<int>.Failure(ResourceError.Concurrency(ex.Message));
         }
         catch (DbUpdateException ex)
         {
@@ -70,7 +65,7 @@ public class UnitOfWork : IUnitOfWork
         }
         catch (Exception ex)
         {
-            return Result<int>.Failure(PersistenceErrors.Unexpected(ex.Message));
+            return Result<int>.Failure(UnexpectedError.Unknown(ex.Message));
         }
     }
 }
