@@ -1,4 +1,5 @@
 using Application.Common.Errors;
+using Application.Common.Errors.Factories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -16,14 +17,33 @@ namespace WebApi.Controllers.v1
 
         private ObjectResult Problem(Error error)
         {
-            var statusCode = error.Type switch
+            int statusCode = StatusCodes.Status500InternalServerError;
+            var errorCode = error.Code;
+            var errorType = error.Type;
+
+            if (errorType == ErrorType.Security)
             {
-                ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
-                ErrorType.Forbidden => StatusCodes.Status403Forbidden,
-                ErrorType.NotFound => StatusCodes.Status404NotFound,
-                ErrorType.Conflict => StatusCodes.Status409Conflict,
-                _ => StatusCodes.Status500InternalServerError,
-            };
+                if (errorCode == SecurityError.ForbiddenCode)
+                {
+                    statusCode = StatusCodes.Status403Forbidden;
+                }
+                else
+                {
+                    statusCode = StatusCodes.Status401Unauthorized;
+                }
+            }
+
+            if (errorType == ErrorType.ResourcePersistence)
+            {
+                if (errorCode == ResourceError.ConflictCode)
+                {
+                    statusCode = StatusCodes.Status409Conflict;
+                }
+                if (errorCode == ResourceError.NotFoundCode)
+                {
+                    statusCode = StatusCodes.Status404NotFound;
+                }
+            }
 
             return Problem(statusCode: statusCode, title: error.Description);
         }
