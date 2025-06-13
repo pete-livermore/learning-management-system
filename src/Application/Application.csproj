@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common/Errors/Codes/" />
     <Folder Include="Dtos/Response/" />
     <Folder Include="Interfaces/Auth/" />
     <Folder Include="Services/CourseEnrolments/" />
