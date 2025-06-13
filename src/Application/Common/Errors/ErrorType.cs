@@ -2,13 +2,10 @@ namespace Application.Common.Errors;
 
 public enum ErrorType
 {
-    Unauthorized,
-    Forbidden,
-    NotFound,
-    Conflict,
-    Unexpected,
+    Security,
+    ResourcePersistence,
     Validation,
-    Concurrency,
     Network,
+    Unexpected,
     None,
 }
