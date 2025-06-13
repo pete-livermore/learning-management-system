@@ -1,10 +1,9 @@
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Security;
 using Application.UseCases.Users.Dtos;
 using Application.UseCases.Users.Errors;
 using Application.Wrappers.Results;
-using Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.UseCases.Users.Commands;
 
@@ -16,16 +15,19 @@ public record class UpdateUserCommand : IRequest<Result<UserDto>>
 
 public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result<UserDto>>
 {
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IUsersRepository _usersRepository;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IIdentityService _identityService;
 
     public UpdateUserCommandHandler(
         IUsersRepository usersRepository,
-        IPasswordHasher<User> passwordHasher
+        IIdentityService identityService,
+        IUnitOfWork unitOfWork
     )
     {
         _usersRepository = usersRepository;
-        _passwordHasher = passwordHasher;
+        _identityService = identityService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<UserDto>> Handle(
@@ -34,7 +36,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
     )
     {
         var userId = request.UserId;
-        var existingUser = await _usersRepository.FindById(userId);
+        var existingUser = await _usersRepository.FindByIdAsync(userId);
 
         if (existingUser is null)
         {
@@ -58,24 +60,26 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             existingUser.LastName = updateUserDto.LastName;
         }
 
-        if (updateUserDto.Password is not null)
-        {
-            string hashedPassword = _passwordHasher.HashPassword(
-                existingUser,
-                updateUserDto.Password
-            );
-            existingUser.Password = hashedPassword;
-        }
+        await _identityService.UpdateUser(
+            existingUser.ApplicationUserId,
+            new UpdateApplicationUserDto() { Email = updateUserDto.Email }
+        );
 
-        var updatedUserRecord = await _usersRepository.Update(existingUser);
+        _usersRepository.Update(existingUser);
+        var saveResult = await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        if (saveResult.IsFailure)
+        {
+            return Result<UserDto>.Failure([.. saveResult.Errors]);
+        }
 
         var updatedUserDto = new UserDto()
         {
-            Id = updatedUserRecord.Id,
-            Email = updatedUserRecord.Email,
-            FirstName = updatedUserRecord.FirstName,
-            LastName = updatedUserRecord.LastName,
-            Role = updatedUserRecord.Role.ToString(),
+            Id = existingUser.Id,
+            Email = existingUser.Email,
+            FirstName = existingUser.FirstName,
+            LastName = existingUser.LastName,
+            Role = existingUser.Role.ToString(),
         };
 
         return Result<UserDto>.Success(updatedUserDto);

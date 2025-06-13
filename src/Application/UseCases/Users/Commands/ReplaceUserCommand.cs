@@ -1,10 +1,12 @@
+using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Security;
+using Application.UseCases.Security.Interfaces;
 using Application.UseCases.Users.Dtos;
 using Application.UseCases.Users.Errors;
 using Application.Wrappers.Results;
-using Domain.Entities;
+using Domain.Enums;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.UseCases.Users.Commands;
 
@@ -17,15 +19,21 @@ public record class ReplaceUserCommand : IRequest<Result<UserDto>>
 public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Result<UserDto>>
 {
     private readonly IUsersRepository _usersRepository;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUserProvider _currentUserProvider;
+    private readonly IIdentityService _identityService;
 
     public ReplaceUserCommandHandler(
         IUsersRepository usersRepository,
-        IPasswordHasher<User> passwordHasher
+        IUnitOfWork unitOfWork,
+        ICurrentUserProvider currentUserProvider,
+        IIdentityService identityService
     )
     {
         _usersRepository = usersRepository;
-        _passwordHasher = passwordHasher;
+        _unitOfWork = unitOfWork;
+        _currentUserProvider = currentUserProvider;
+        _identityService = identityService;
     }
 
     public async Task<Result<UserDto>> Handle(
@@ -35,30 +43,55 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
     {
         var userId = request.UserId;
         var replaceUserDto = request.ReplaceCommand;
-        var existingUser = await _usersRepository.FindById(userId);
+        var userEntity = await _usersRepository.FindByIdAsync(userId);
 
-        if (existingUser is null)
+        if (userEntity is null)
         {
             return Result<UserDto>.Failure(UserErrors.NotFound(userId));
         }
 
-        existingUser.Email = replaceUserDto.Email;
-        existingUser.FirstName = replaceUserDto.FirstName;
-        existingUser.LastName = replaceUserDto.LastName;
-        string hashedPassword = _passwordHasher.HashPassword(existingUser, replaceUserDto.Password);
-        existingUser.Password = hashedPassword;
-        existingUser.Role = existingUser.Role;
+        var currentUserDto = _currentUserProvider.GetCurrentUser();
+        var isAdminUser = currentUserDto.Roles.Any(r => r == UserRole.Administrator);
+        if (!isAdminUser && userEntity.ApplicationUserId != currentUserDto.Id)
+        {
+            return Result<UserDto>.Failure(UserErrors.Forbidden());
+        }
 
-        var updatedUserRecord = await _usersRepository.Update(existingUser);
+        var updateApplicationUserDto = new UpdateApplicationUserDto()
+        {
+            Email = replaceUserDto.Email,
+        };
+        var updateAplicationUserResult = await _identityService.UpdateUser(
+            userEntity.ApplicationUserId,
+            updateApplicationUserDto
+        );
+
+        if (updateAplicationUserResult.IsFailure)
+        {
+            return Result<UserDto>.Failure([.. updateAplicationUserResult.Errors]);
+        }
+
+        userEntity.Email = replaceUserDto.Email;
+        userEntity.FirstName = replaceUserDto.FirstName;
+        userEntity.LastName = replaceUserDto.LastName;
+        userEntity.Role = userEntity.Role;
+
+        _usersRepository.Update(userEntity);
 
         var updatedUserDto = new UserDto()
         {
-            Id = updatedUserRecord.Id,
-            FirstName = updatedUserRecord.FirstName,
-            LastName = updatedUserRecord.LastName,
-            Email = updatedUserRecord.Email,
-            Role = updatedUserRecord.Role.ToString(),
+            Id = userEntity.Id,
+            FirstName = userEntity.FirstName,
+            LastName = userEntity.LastName,
+            Email = userEntity.Email,
+            Role = userEntity.Role.ToString(),
         };
+
+        var commitResult = await _unitOfWork.SaveChangesAsync(cancellationToken);
+        if (commitResult.IsFailure)
+        {
+            return Result<UserDto>.Failure([.. commitResult.Errors]);
+        }
 
         return Result<UserDto>.Success(updatedUserDto);
     }
