@@ -1,5 +1,4 @@
 using Application.Common.Interfaces.Repositories;
-using Application.UseCases.Security.Errors;
 using Application.UseCases.Security.Interfaces;
 using Application.UseCases.Users.Dtos;
 using Application.UseCases.Users.Errors;
@@ -17,12 +16,15 @@ public record GetUserByIdQuery : IRequest<Result<UserDto>>
 public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
 {
     private readonly IUsersRepository _usersRepository;
-    private readonly IUserAccessor _userAccessor;
+    private readonly ICurrentUserProvider _currentUserProvider;
 
-    public GetUserByIdQueryHandler(IUsersRepository usersRepository, IUserAccessor userAccessor)
+    public GetUserByIdQueryHandler(
+        ICurrentUserProvider currentUserProvider,
+        IUsersRepository usersRepository
+    )
     {
+        _currentUserProvider = currentUserProvider;
         _usersRepository = usersRepository;
-        _userAccessor = userAccessor;
     }
 
     public async Task<Result<UserDto>> Handle(
@@ -31,18 +33,19 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<
     )
     {
         var userId = request.UserId;
-        var currentUser = _userAccessor.GetCurrentUser();
+        var currentUser = _currentUserProvider.GetCurrentUser();
 
-        if (currentUser.Role != UserRole.Admin && currentUser.Id != userId)
-        {
-            return Result<UserDto>.Failure(SecurityErrors.Forbidden());
-        }
-
-        var user = await _usersRepository.FindById(userId);
+        var user = await _usersRepository.FindByIdAsync(userId);
 
         if (user is null)
         {
             return Result<UserDto>.Failure(UserErrors.NotFound(userId));
+        }
+
+        bool isAdminUser = currentUser.Roles.Contains(UserRole.Administrator);
+        if (!isAdminUser && user.ApplicationUserId != currentUser.Id)
+        {
+            return Result<UserDto>.Failure(UserErrors.Forbidden());
         }
 
         var userDto = new UserDto()
@@ -53,6 +56,7 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<
             Email = user.Email,
             Role = user.Role.ToString(),
         };
+
         return Result<UserDto>.Success(userDto);
     }
 }
