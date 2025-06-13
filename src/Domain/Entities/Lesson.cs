@@ -6,4 +6,5 @@ public class Lesson : BaseEntity
     public string Title { get; set; } = "";
     public string Description { get; set; } = "";
     public ICollection<LessonContent> Contents = [];
+    public required Guid OwnerId { get; init; }
 }
