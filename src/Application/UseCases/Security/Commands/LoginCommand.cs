@@ -1,11 +1,6 @@
-using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Token;
-using Application.UseCases.Security.Dtos;
-using Application.UseCases.Security.Errors;
+using Application.Common.Interfaces.Security;
 using Application.Wrappers.Results;
-using Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.UseCases.Security.Commands;
 
@@ -17,19 +12,11 @@ public record class LoginCommand : IRequest<Result<string>>
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
 {
-    private readonly ITokenService _tokenService;
-    private readonly IUsersRepository _usersRepository;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IIdentityService _identityService;
 
-    public LoginCommandHandler(
-        ITokenService tokenService,
-        IUsersRepository usersRepository,
-        IPasswordHasher<User> passwordHasher
-    )
+    public LoginCommandHandler(IIdentityService identityService)
     {
-        _tokenService = tokenService;
-        _usersRepository = usersRepository;
-        _passwordHasher = passwordHasher;
+        _identityService = identityService;
     }
 
     public async Task<Result<string>> Handle(
@@ -39,32 +26,6 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
     {
         string suppliedEmail = request.Email;
         string suppliedPassword = request.Password;
-        var user = await _usersRepository.FindByEmail(suppliedEmail);
-
-        if (user is null)
-        {
-            return Result<string>.Failure(SecurityErrors.Unauthorized());
-        }
-        var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
-            user,
-            user.Password,
-            suppliedPassword
-        );
-
-        if (passwordVerificationResult == PasswordVerificationResult.Failed)
-        {
-            return Result<string>.Failure(SecurityErrors.Unauthorized());
-        }
-
-        string token = _tokenService.Generate(
-            new TokenDataDto()
-            {
-                UserId = user.Id,
-                Email = user.Email,
-                Role = user.Role.ToString(),
-            }
-        );
-
-        return Result<string>.Success(token);
+        return await _identityService.AuthenticateUserAsync(suppliedEmail, suppliedPassword);
     }
 }
