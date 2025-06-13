@@ -1,10 +1,8 @@
 using Application.Common.Dtos;
+using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.UseCases.Security.Errors;
 using Application.UseCases.Security.Interfaces;
 using Application.UseCases.Uploads.Dtos;
-using Application.UseCases.Uploads.Errors;
-using Application.UseCases.Uploads.Helpers;
 using Application.UseCases.Uploads.Interfaces;
 using Application.Wrappers.Results;
 using Domain.Entities;
@@ -24,19 +22,19 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
     private readonly IFileValidator _fileValidator;
     private readonly IUploadsService _uploadsService;
     private readonly IFilesRepository _filesRepository;
-    private readonly IUserAccessor _userAccessor;
+    private readonly ICurrentUserProvider _currentUserProvider;
 
     public CreateFileCommandHandler(
         IFileValidator fileValidator,
         IFilesRepository filesRepository,
         IUploadsService uploadsService,
-        IUserAccessor userAccessor
+        ICurrentUserProvider currentUserProvider
     )
     {
         _fileValidator = fileValidator;
         _filesRepository = filesRepository;
         _uploadsService = uploadsService;
-        _userAccessor = userAccessor;
+        _currentUserProvider = currentUserProvider;
     }
 
     public async Task<Result<FileDto>> Handle(
@@ -50,7 +48,7 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
 
         if (!isValidFile)
         {
-            return Result<FileDto>.Failure(UploadErrors.Validation("Invalid file"));
+            return Result<FileDto>.Failure(ValidationError.InvalidInput("Invalid file"));
         }
 
         string fileMimeType = file.ContentType;
@@ -58,11 +56,13 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
         var providerMetadata = uploadResult.ProviderMetadata;
         string providerId = providerMetadata.Id;
         ;
-        var authenticatedUser = _userAccessor.GetCurrentUser();
+        var currentUserDto = _currentUserProvider.GetCurrentUser();
 
-        if (authenticatedUser == null)
+        if (currentUserDto == null)
         {
-            return Result<FileDto>.Failure(SecurityErrors.Unauthorized());
+            return Result<FileDto>.Failure(
+                SecurityError.Unauthorized("The current user in not authenticated")
+            );
         }
 
         string fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
@@ -73,7 +73,7 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
             Mime = fileMimeType,
             Ext = fileExtension,
             ProviderId = providerId,
-            OwnerId = authenticatedUser.Id,
+            OwnerId = currentUserDto.Id,
         };
 
         await _filesRepository.Add(newFileRecord);
@@ -83,7 +83,7 @@ public class CreateFileCommandHandler : IRequestHandler<CreateFileCommand, Resul
             Url = newFileRecord.Url,
             Mime = newFileRecord.Mime,
             Ext = newFileRecord.Ext,
-            Owner = new EntityOwnerDto { Id = newFileRecord.OwnerId },
+            Owner = new EntityOwnerDto { Id = currentUserDto.Id.ToString() },
             ProviderId = newFileRecord.ProviderId,
             CreatedAt = newFileRecord.CreatedAt,
             UpdatedAt = newFileRecord.CreatedAt,
