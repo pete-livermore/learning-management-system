@@ -12,7 +12,7 @@ namespace Application.UnitTests.UseCases.Uploads.Commands
         private readonly Mock<IFileValidator> _fileValidatorMock = new();
         private readonly Mock<IUploadsService> _uploadsServiceMock = new();
         private readonly Mock<IFilesRepository> _filesRepositoryMock = new();
-        private readonly Mock<IUserAccessor> _userAccessorMock = new();
+        private readonly Mock<ICurrentUserProvider> _userAccessorMock = new();
 
         public CreateFileCommandHandler CreateHandler()
         {
