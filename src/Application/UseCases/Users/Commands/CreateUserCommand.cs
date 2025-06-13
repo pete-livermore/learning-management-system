@@ -1,11 +1,12 @@
+using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Security;
+using Application.UseCases.Security.Dtos;
 using Application.UseCases.Users.Dtos;
-using Application.UseCases.Users.Errors;
 using Application.Wrappers.Results;
 using Domain.Entities;
 using Domain.Enums;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.UseCases.Users.Commands;
 
@@ -16,16 +17,19 @@ public record class CreateUserCommand : IRequest<Result<UserDto>>
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<UserDto>>
 {
+    private readonly IIdentityService _identityService;
     private readonly IUsersRepository _usersRepository;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateUserCommandHandler(
+        IIdentityService identityService,
         IUsersRepository usersRepository,
-        IPasswordHasher<User> passwordHasher
+        IUnitOfWork unitOfWork
     )
     {
+        _identityService = identityService;
         _usersRepository = usersRepository;
-        _passwordHasher = passwordHasher;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<UserDto>> Handle(
@@ -34,31 +38,57 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
     )
     {
         var createUserDto = request.CreateCommand;
-        var existingUser = await _usersRepository.FindByEmail(createUserDto.Email);
+        var userEmail = createUserDto.Email;
 
-        if (existingUser != null)
-        {
-            return Result<UserDto>.Failure(UserErrors.Conflict(createUserDto.Email));
-        }
-
-        var newUser = new User()
+        var createApplicationUserDto = new CreateApplicationUserDto()
         {
             Email = createUserDto.Email,
+            Password = createUserDto.Password,
+            Roles = [createUserDto.Role],
+        };
+        var createApplicationUserResult = await _identityService.CreateUserAsync(
+            createApplicationUserDto
+        );
+
+        if (createApplicationUserResult.IsFailure)
+        {
+            return Result<UserDto>.Failure([.. createApplicationUserResult.Errors]);
+        }
+
+        var existingDomainUser = await _usersRepository.FindByEmailAsync(userEmail);
+
+        if (existingDomainUser is not null)
+        {
+            return Result<UserDto>.Failure(
+                ResourceError.Conflict($"The user with {userEmail} already exists")
+            );
+        }
+
+        var applicationUserDto = createApplicationUserResult.Value;
+        var domainUser = new User()
+        {
+            Email = userEmail,
             FirstName = createUserDto.FirstName,
             LastName = createUserDto.LastName,
             Role = Enum.Parse<UserRole>(createUserDto.Role),
-            Password = "",
+            ApplicationUserId = applicationUserDto.Id, // Crucial link
         };
-        newUser.Password = _passwordHasher.HashPassword(newUser, createUserDto.Password);
-        var createdUserRecord = await _usersRepository.Add(newUser);
+
+        _usersRepository.Add(domainUser);
+        var saveResult = await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        if (saveResult.IsFailure)
+        {
+            return Result<UserDto>.Failure([.. saveResult.Errors]);
+        }
 
         var newUserDto = new UserDto()
         {
-            Email = createdUserRecord.Email,
-            FirstName = createdUserRecord.FirstName,
-            LastName = createdUserRecord.LastName,
-            Role = createdUserRecord.Role.ToString(),
-            Id = createdUserRecord.Id,
+            Email = domainUser.Email,
+            FirstName = domainUser.FirstName,
+            LastName = domainUser.LastName,
+            Role = domainUser.Role.ToString(),
+            Id = domainUser.Id,
         };
 
         return Result<UserDto>.Success(newUserDto);
