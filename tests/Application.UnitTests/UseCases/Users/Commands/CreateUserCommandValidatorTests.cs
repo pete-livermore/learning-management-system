@@ -20,7 +20,7 @@ namespace Application.UnitTests.UseCases.Users.Commands
                 LastName = "user",
                 Email = "test_email@email.com",
                 Password = "password",
-                Role = UserRole.Admin.ToString(),
+                Role = UserRole.Administrator.ToString(),
             };
 
             var command = new CreateUserCommand() { CreateCommand = testDto };
@@ -39,7 +39,7 @@ namespace Application.UnitTests.UseCases.Users.Commands
                 LastName = "",
                 Email = "test_email@email.com",
                 Password = "password",
-                Role = UserRole.Admin.ToString(),
+                Role = UserRole.Administrator.ToString(),
             };
 
             var command = new CreateUserCommand() { CreateCommand = testDto };
@@ -58,7 +58,7 @@ namespace Application.UnitTests.UseCases.Users.Commands
                 LastName = "user",
                 Email = "test_email/email.com",
                 Password = "password",
-                Role = UserRole.Admin.ToString(),
+                Role = UserRole.Administrator.ToString(),
             };
 
             var command = new CreateUserCommand() { CreateCommand = testDto };
@@ -77,7 +77,7 @@ namespace Application.UnitTests.UseCases.Users.Commands
                 LastName = "user",
                 Email = "test_email@email.com",
                 Password = "",
-                Role = UserRole.Admin.ToString(),
+                Role = UserRole.Administrator.ToString(),
             };
 
             var command = new CreateUserCommand() { CreateCommand = testDto };
@@ -115,7 +115,7 @@ namespace Application.UnitTests.UseCases.Users.Commands
                 LastName = "user",
                 Email = "test_email@email.com",
                 Password = "password",
-                Role = UserRole.Admin.ToString(),
+                Role = UserRole.Administrator.ToString(),
             };
 
             var command = new CreateUserCommand() { CreateCommand = testDto };
