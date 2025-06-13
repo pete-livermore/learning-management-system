@@ -1,15 +1,14 @@
 using System.Text.Json;
 using Application.Common.Errors;
+using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Security;
 using Application.Common.Interfaces.Token;
 using Application.UseCases.Security.Dtos;
-using Application.UseCases.Security.Errors;
 using Application.UseCases.Users.Dtos;
 using Application.Wrappers.Results;
 using Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 
 namespace Infrastructure.Identity.Services;
 
@@ -41,7 +40,7 @@ public class IdentityService : IIdentityService
 
             if (code == "DuplicateEmail")
             {
-                return IdentityErrors.Conflict(userEmail);
+                return ResourceError.Conflict($"User with email {userEmail} already exists");
             }
 
             if (
@@ -53,13 +52,11 @@ public class IdentityService : IIdentityService
                 || code == "PasswordRequiresUniqueChars"
             )
             {
-                return IdentityErrors.Validation(
-                    userEmail,
-                    "Password does not meet the requirements"
-                );
+                return ValidationError.InvalidInput("Password does not meet the requirements");
             }
         }
-        return IdentityErrors.Unexpected();
+        return UnexpectedError.Unknown(errors.First().Code);
+        ;
     }
 
     public async Task<Result<ApplicationUserDto>> CreateUserAsync(
@@ -92,7 +89,9 @@ public class IdentityService : IIdentityService
 
         if (invalidRoles.Any())
         {
-            return Result<ApplicationUserDto>.Failure(IdentityErrors.Validation(userEmail));
+            return Result<ApplicationUserDto>.Failure(
+                ValidationError.InvalidInput("At least some of the supplied roles were invalid")
+            );
         }
 
         var addRolesResult = await _userManager.AddToRolesAsync(applicationUser, requestedRoles);
@@ -100,7 +99,12 @@ public class IdentityService : IIdentityService
         if (!addRolesResult.Succeeded)
         {
             await _userManager.DeleteAsync(applicationUser); // Rollback user if role assignment fails
-            return Result<ApplicationUserDto>.Failure(new Error(ErrorType.Unexpected, "", ""));
+            return Result<ApplicationUserDto>.Failure(
+                UnexpectedError.Unknown(
+                    "There was an error adding the given roles to the application user",
+                    addRolesResult.Errors.First().Description
+                )
+            );
         }
 
         var userRoles = await _userManager.GetRolesAsync(applicationUser);
@@ -123,7 +127,7 @@ public class IdentityService : IIdentityService
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user is null)
         {
-            return Result.Failure(IdentityErrors.NotFound(userId));
+            return Result.Failure(ResourceError.NotFound($"User with Id {userId} not found"));
         }
         var newEmail = updateApplicationUserDto.Email;
 
@@ -148,7 +152,9 @@ public class IdentityService : IIdentityService
 
         if (user is null)
         {
-            return Result<List<string>>.Failure(IdentityErrors.NotFound(userId));
+            return Result<List<string>>.Failure(
+                ResourceError.NotFound($"Application user with Id {userId} not found")
+            );
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -160,7 +166,9 @@ public class IdentityService : IIdentityService
         var userToDelete = await _userManager.FindByIdAsync(userId.ToString());
         if (userToDelete is null)
         {
-            return Result.Failure(IdentityErrors.NotFound(userId));
+            return Result.Failure(
+                ResourceError.NotFound($"Application user with Id {userId} not found")
+            );
         }
         ;
         var deleteResult = await _userManager.DeleteAsync(userToDelete);
@@ -179,28 +187,18 @@ public class IdentityService : IIdentityService
 
         if (applicationUser is null || applicationUser.Email is null)
         {
-            return Result<string>.Failure(SecurityErrors.Unauthorized());
+            return Result<string>.Failure(SecurityError.Unauthorized("User not found"));
         }
 
-        var signInResult = await _signInManager.CheckPasswordSignInAsync(
-            applicationUser,
-            password,
-            false
-        );
+        var isValidPassword = await _userManager.CheckPasswordAsync(applicationUser, password);
 
-        if (signInResult.IsLockedOut)
+        if (!isValidPassword)
         {
             return Result<string>.Failure(
-                IdentityErrors.Forbidden(
-                    "This account has been locked out, please try again later."
+                SecurityError.InvalidCredentials(
+                    "The supplied credentials are invalid",
+                    "Invalid password"
                 )
-            );
-        }
-
-        if (signInResult.IsNotAllowed)
-        {
-            return Result<string>.Failure(
-                IdentityErrors.Forbidden("This user is not able to sign in")
             );
         }
 
