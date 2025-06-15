@@ -16,19 +16,16 @@ public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ITokenService _tokenService;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
-        SignInManager<ApplicationUser> signInManager,
         ITokenService tokenService
     )
     {
         _userManager = userManager;
         _roleManager = roleManager;
-        _signInManager = signInManager;
         _tokenService = tokenService;
     }
 
@@ -70,6 +67,7 @@ public class IdentityService : IIdentityService
             EmailConfirmed = false,
             UserName = userEmail,
         };
+
         var createResult = await _userManager.CreateAsync(applicationUser, createUserDto.Password);
 
         if (!createResult.Succeeded)
