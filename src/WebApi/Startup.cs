@@ -26,7 +26,8 @@ public class Startup
         services.AddApplicationLayer();
         services.AddPersistenceInfrastructure(Configuration);
         services
-            .AddIdentity<ApplicationUser, ApplicationRole>()
+            .AddIdentityCore<ApplicationUser>()
+            .AddRoles<ApplicationRole>()
             .AddEntityFrameworkStores<LearningManagementSystemDbContext>()
             .AddDefaultTokenProviders();
         services.AddIdentityInfrastructure(Configuration);
