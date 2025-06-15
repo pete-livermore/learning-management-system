@@ -4,7 +4,7 @@ using Domain.Enums;
 using FluentValidation;
 using FluentValidation.TestHelper;
 
-namespace Application.UnitTests.UseCases.Users.Commands
+namespace Application.UnitTests.Tests.UseCases.Users.Commands
 {
     public class CreateUserCommandValidatorTests
     {

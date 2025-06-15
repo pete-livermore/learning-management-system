@@ -8,7 +8,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Moq;
 
-namespace Application.UnitTests.UseCases.Users.Queries
+namespace Application.UnitTests.Tests.UseCases.Users.Queries
 {
     public class GetUserByIdQueryTests
     {

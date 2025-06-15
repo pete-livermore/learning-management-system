@@ -10,7 +10,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Moq;
 
-namespace Application.UnitTests.UseCases.Users.Commands;
+namespace Application.UnitTests.Tests.UseCases.Users.Commands;
 
 public class CreateUserCommandTests
 {

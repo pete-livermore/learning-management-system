@@ -5,7 +5,7 @@ using Application.UseCases.Uploads.Commands;
 using Application.UseCases.Uploads.Interfaces;
 using Moq;
 
-namespace Application.UnitTests.UseCases.Uploads.Commands
+namespace Application.UnitTests.Tests.UseCases.Uploads.Commands
 {
     public class CreateFileCommandTests
     {

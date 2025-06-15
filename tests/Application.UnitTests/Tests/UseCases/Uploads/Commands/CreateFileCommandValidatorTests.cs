@@ -4,7 +4,7 @@ using Application.UseCases.Uploads.Dtos;
 using FluentAssertions;
 using Moq;
 
-namespace Application.UnitTests.UseCases.Uploads.Commands
+namespace Application.UnitTests.Tests.UseCases.Uploads.Commands
 {
     public class CreateFileCommandValidatorTests
     {
