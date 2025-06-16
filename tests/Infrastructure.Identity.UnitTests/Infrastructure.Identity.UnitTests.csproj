@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../cli/Shared/Shared.csproj" />
     <ProjectReference Include="../../src/Application/Application.csproj" />
     <ProjectReference Include="../../src/Infrastructure.Identity/Infrastructure.Identity.csproj" />
     <ProjectReference Include="../Shared/Shared.csproj" />
