@@ -29,7 +29,7 @@ public class IdentityService : IIdentityService
         _tokenService = tokenService;
     }
 
-    private Error GetIdentityError(IEnumerable<IdentityError> errors, string userEmail)
+    private Error GetUserError(IEnumerable<IdentityError> errors, string userEmail)
     {
         foreach (var err in errors)
         {
@@ -50,6 +50,31 @@ public class IdentityService : IIdentityService
             )
             {
                 return ValidationError.InvalidInput("Password does not meet the requirements");
+            }
+
+            if (code == "DuplicateRoleName" || code == "InvalidRoleName")
+            {
+                return ValidationError.InvalidInput("Invalid role name");
+            }
+        }
+        return UnexpectedError.Unknown(errors.First().Code);
+        ;
+    }
+
+    private Error GetRoleError(IEnumerable<IdentityError> errors, string roleName)
+    {
+        foreach (var err in errors)
+        {
+            string code = err.Code;
+
+            if (code == "DuplicateRoleName")
+            {
+                return ResourceError.Conflict($"The {roleName} role already exists");
+            }
+            if (code == "InvalidRoleName")
+            {
+                return ValidationError.InvalidInput($"{roleName} is an invalid role name");
+                ;
             }
         }
         return UnexpectedError.Unknown(errors.First().Code);
@@ -72,12 +97,7 @@ public class IdentityService : IIdentityService
 
         if (!createResult.Succeeded)
         {
-            Console.WriteLine(
-                $"IDENTITY ERRORs => {JsonSerializer.Serialize(createResult.Errors)}"
-            );
-            return Result<ApplicationUserDto>.Failure(
-                GetIdentityError(createResult.Errors, userEmail)
-            );
+            return Result<ApplicationUserDto>.Failure(GetUserError(createResult.Errors, userEmail));
         }
         ;
 
@@ -117,7 +137,48 @@ public class IdentityService : IIdentityService
         return Result<ApplicationUserDto>.Success(applicationUserDto);
     }
 
-    public async Task<Result> UpdateUser(
+    public async Task<Result<ApplicationUserDto>> FindUserByEmailAsync(string userEmail)
+    {
+        var user = await _userManager.FindByEmailAsync(userEmail);
+        if (user is null)
+        {
+            return Result<ApplicationUserDto>.Failure(
+                ResourceError.NotFound($"Application user with email {userEmail} not found")
+            );
+        }
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        var applicationUserDto = new ApplicationUserDto()
+        {
+            Id = user.Id,
+            Email = userEmail,
+            Roles = userRoles.ToList(),
+        };
+        return Result<ApplicationUserDto>.Success(applicationUserDto);
+    }
+
+    public async Task<Result<ApplicationUserDto>> FindUserByIdAsync(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return Result<ApplicationUserDto>.Failure(
+                ResourceError.NotFound($"Application user with ID {userId} not found")
+            );
+        }
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        var applicationUserDto = new ApplicationUserDto()
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            Roles = userRoles.ToList(),
+        };
+        return Result<ApplicationUserDto>.Success(applicationUserDto);
+    }
+
+    public async Task<Result> UpdateUserAsync(
         Guid userId,
         UpdateApplicationUserDto updateApplicationUserDto
     )
@@ -159,7 +220,7 @@ public class IdentityService : IIdentityService
         return Result<List<string>>.Success(roles.ToList());
     }
 
-    public async Task<Result> DeleteAsync(Guid userId)
+    public async Task<Result> DeleteUserAsync(Guid userId)
     {
         var userToDelete = await _userManager.FindByIdAsync(userId.ToString());
         if (userToDelete is null)
@@ -177,6 +238,24 @@ public class IdentityService : IIdentityService
         }
 
         return Result.Success();
+    }
+
+    public async Task<Result<ApplicationRoleDto>> CreateRoleAsync(
+        CreateApplicationRoleDto createApplicationRoleDto
+    )
+    {
+        string roleName = createApplicationRoleDto.Name;
+        var newRole = new ApplicationRole() { Name = roleName };
+        var createRoleResult = await _roleManager.CreateAsync(newRole);
+
+        if (!createRoleResult.Succeeded)
+        {
+            return Result<ApplicationRoleDto>.Failure(
+                GetRoleError(createRoleResult.Errors, roleName)
+            );
+        }
+        var roleDto = new ApplicationRoleDto() { Name = roleName };
+        return Result<ApplicationRoleDto>.Success(roleDto);
     }
 
     public async Task<Result<string>> AuthenticateUserAsync(string userEmail, string password)
