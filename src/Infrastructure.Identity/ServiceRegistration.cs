@@ -2,7 +2,6 @@ using System.Text;
 using Application.Common.Interfaces.Security;
 using Application.Common.Interfaces.Token;
 using Application.UseCases.Security.Interfaces;
-using Infrastructure.Identity.Models;
 using Infrastructure.Identity.Services;
 using LearningManagementSystem.Infrastructure.Identity.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
