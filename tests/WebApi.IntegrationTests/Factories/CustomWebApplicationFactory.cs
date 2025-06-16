@@ -1,5 +1,8 @@
+using Application.Common.Interfaces.Security;
+using Infrastructure.Identity.Models;
 using Infrastructure.Persistence.Contexts;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using WebApi.IntegrationTests.Helpers;
@@ -57,8 +60,11 @@ namespace WebApi.IntegrationTests.Factories
 
                 // Database seeding
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                var dataSeeder = new TestDataSeeder(mediator);
-                dataSeeder.SeedData().GetAwaiter().GetResult();
+                var identityService = scope.ServiceProvider.GetRequiredService<IIdentityService>();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<TestDataSeeder>>();
+                var dataSeeder = new TestDataSeeder(mediator, identityService, logger);
+                dataSeeder.SeedRoles().GetAwaiter().GetResult();
+                dataSeeder.SeedUsers().GetAwaiter().GetResult();
             });
 
             builder.UseEnvironment("Development"); // Ensure consistent environment
