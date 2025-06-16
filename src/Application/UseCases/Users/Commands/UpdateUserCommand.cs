@@ -60,7 +60,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             existingUser.LastName = updateUserDto.LastName;
         }
 
-        await _identityService.UpdateUser(
+        await _identityService.UpdateUserAsync(
             existingUser.ApplicationUserId,
             new UpdateApplicationUserDto() { Email = updateUserDto.Email }
         );

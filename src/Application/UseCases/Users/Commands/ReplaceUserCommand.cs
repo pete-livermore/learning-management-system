@@ -61,7 +61,7 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
         {
             Email = replaceUserDto.Email,
         };
-        var updateAplicationUserResult = await _identityService.UpdateUser(
+        var updateAplicationUserResult = await _identityService.UpdateUserAsync(
             userEntity.ApplicationUserId,
             updateApplicationUserDto
         );

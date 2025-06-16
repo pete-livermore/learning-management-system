@@ -50,7 +50,7 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Resul
             return Result.Failure(UserErrors.Forbidden());
         }
 
-        var deleteIdentityUserResult = await _identityService.DeleteAsync(
+        var deleteIdentityUserResult = await _identityService.DeleteUserAsync(
             userToDelete.ApplicationUserId
         );
         if (deleteIdentityUserResult.IsFailure)
