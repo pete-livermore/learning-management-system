@@ -1,5 +1,5 @@
 using Domain.Common;
-using Domain.Uploads;
+using Domain.Uploads.Entities;
 
 namespace Domain.Lessons.Entities;
 
