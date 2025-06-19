@@ -1,8 +1,6 @@
-using Application.Common.Configuration;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 
-namespace Application.UseCases.Uploads.Commands;
+namespace Application.Uploads.Commands;
 
 public class CreateFileCommandValidator : AbstractValidator<CreateFileCommand>
 {

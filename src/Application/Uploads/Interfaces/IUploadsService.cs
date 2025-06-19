@@ -1,4 +1,4 @@
-using Application.UseCases.Uploads.Dtos;
+using Application.Uploads.Dtos;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.UseCases.Uploads.Interfaces;

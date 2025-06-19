@@ -1,15 +1,15 @@
 using Application.Common.Dtos;
 using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.UseCases.Security.Interfaces;
-using Application.UseCases.Uploads.Dtos;
+using Application.Common.Wrappers.Results;
+using Application.Security.Interfaces;
+using Application.Uploads.Dtos;
 using Application.UseCases.Uploads.Interfaces;
-using Application.Wrappers.Results;
-using Domain.Entities;
+using Domain.Uploads.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
-namespace Application.UseCases.Uploads.Commands;
+namespace Application.Uploads.Commands;
 
 public record CreateFileCommand : IRequest<Result<FileDto>>
 {

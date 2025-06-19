@@ -1,4 +1,4 @@
-namespace Application.UseCases.Uploads.Dtos
+namespace Application.Uploads.Dtos
 {
     public class UploadProviderMetadata
     {

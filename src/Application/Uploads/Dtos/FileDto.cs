@@ -1,6 +1,6 @@
 using Application.Common.Dtos;
 
-namespace Application.UseCases.Uploads.Dtos
+namespace Application.Uploads.Dtos
 {
     public record FileDto
     {
