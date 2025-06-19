@@ -1,4 +1,4 @@
-using Application.UseCases.Uploads.Dtos;
+using Application.Uploads.Dtos;
 using Application.UseCases.Uploads.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
