@@ -1,4 +1,4 @@
-using Application.UseCases.Security.Dtos;
+using Application.Security.Dtos;
 
 namespace Application.Common.Interfaces.Token;
 

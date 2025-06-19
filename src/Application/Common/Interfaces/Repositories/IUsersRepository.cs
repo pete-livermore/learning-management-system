@@ -1,6 +1,6 @@
 using Application.Common.Dtos;
-using Application.UseCases.Users.Dtos;
-using Domain.Entities;
+using Application.Users.Dtos;
+using Domain.Users.Entities;
 
 namespace Application.Common.Interfaces.Repositories;
 

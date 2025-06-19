@@ -1,5 +1,5 @@
 using Application.Common.Errors;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
 using FluentValidation;
 using MediatR;
 

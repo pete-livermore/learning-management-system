@@ -2,7 +2,7 @@ namespace Application.Common.Interfaces.Repositories;
 
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
 
 public interface IUnitOfWork
 {
