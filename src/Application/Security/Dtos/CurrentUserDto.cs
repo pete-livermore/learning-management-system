@@ -1,6 +1,6 @@
-using Domain.Enums;
+using Domain.Users.Enums;
 
-namespace Application.UseCases.Security.Dtos;
+namespace Application.Security.Dtos;
 
 public record CurrentUserDto
 {

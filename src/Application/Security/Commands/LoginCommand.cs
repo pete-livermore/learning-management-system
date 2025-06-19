@@ -1,8 +1,8 @@
-using Application.Common.Interfaces.Security;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
+using Application.Security.Interfaces;
 using MediatR;
 
-namespace Application.UseCases.Security.Commands;
+namespace Application.Security.Commands;
 
 public record class LoginCommand : IRequest<Result<string>>
 {

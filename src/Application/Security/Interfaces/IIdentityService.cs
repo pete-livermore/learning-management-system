@@ -1,8 +1,7 @@
-using Application.UseCases.Security.Dtos;
-using Application.UseCases.Users.Dtos;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
+using Application.Security.Dtos;
 
-namespace Application.Common.Interfaces.Security
+namespace Application.Security.Interfaces
 {
     public interface IIdentityService
     {
