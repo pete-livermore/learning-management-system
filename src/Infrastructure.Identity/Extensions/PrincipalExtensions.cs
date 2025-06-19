@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Domain.Enums;
+using Domain.Users.Enums;
 
 namespace Infrastructure.Identity.Extensions
 {

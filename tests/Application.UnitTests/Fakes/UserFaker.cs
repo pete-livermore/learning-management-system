@@ -1,5 +1,5 @@
 using Bogus;
-using Domain.Entities;
+using Domain.Users.Entities;
 
 namespace Application.UnitTests.Fakes;
 

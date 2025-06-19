@@ -1,4 +1,6 @@
-using Domain.Entities;
+using Domain.Lessons.Entities;
+using Domain.Uploads.Entities;
+using Domain.Users.Entities;
 using Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

@@ -1,11 +1,11 @@
-using Application.Common.Interfaces.Security;
-using Infrastructure.Identity.Models;
+using Application.Security.Interfaces;
+using Domain.Users.Enums;
 using Infrastructure.Persistence.Contexts;
+using Infrastructure.Persistence.Helpers;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using WebApi.IntegrationTests.Helpers;
+using WebApi.IntegrationTests.Fixtures;
 
 namespace WebApi.IntegrationTests.Factories
 {
@@ -17,6 +17,28 @@ namespace WebApi.IntegrationTests.Factories
         public void SetConnectionString(string connectionString)
         {
             ConnectionString = connectionString;
+        }
+
+        private static async Task SeedTestDataAsync(IServiceProvider serviceProvider)
+        {
+            var mediator = serviceProvider.GetRequiredService<IMediator>();
+            var identityService = serviceProvider.GetRequiredService<IIdentityService>();
+            var logger = serviceProvider.GetRequiredService<ILogger<DataSeeder>>();
+            var dataSeeder = new DataSeeder(mediator, identityService, logger);
+
+            var seededUserRole = UserRole.Administrator;
+            await dataSeeder.SeedApplicationRoleAsync(seededUserRole);
+
+            var userFixture = TestUserFixture.Admin;
+            var userSeedDto = new UserSeedDto()
+            {
+                Email = userFixture.Email,
+                FirstName = userFixture.FirstName,
+                LastName = userFixture.LastName,
+                Password = userFixture.Password,
+                Role = seededUserRole,
+            };
+            await dataSeeder.SeedUserAsync(userSeedDto);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -54,17 +76,15 @@ namespace WebApi.IntegrationTests.Factories
                 // Database creation/migration:
                 var serviceProvider = services.BuildServiceProvider();
                 using var scope = serviceProvider.CreateScope();
+                var scopedServiceProvider = scope.ServiceProvider;
                 var dbContext =
-                    scope.ServiceProvider.GetRequiredService<LearningManagementSystemDbContext>();
+                    scopedServiceProvider.GetRequiredService<LearningManagementSystemDbContext>();
                 dbContext.Database.Migrate();
 
                 // Database seeding
-                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                var identityService = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-                var logger = scope.ServiceProvider.GetRequiredService<ILogger<TestDataSeeder>>();
-                var dataSeeder = new TestDataSeeder(mediator, identityService, logger);
-                dataSeeder.SeedRoles().GetAwaiter().GetResult();
-                dataSeeder.SeedUsers().GetAwaiter().GetResult();
+                Task.Run(async () => await SeedTestDataAsync(scopedServiceProvider))
+                    .GetAwaiter()
+                    .GetResult();
             });
 
             builder.UseEnvironment("Development"); // Ensure consistent environment

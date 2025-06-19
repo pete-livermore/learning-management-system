@@ -1,7 +1,7 @@
 using Application.Common.Dtos;
 using Application.Common.Interfaces.Repositories;
-using Application.UseCases.Users.Dtos;
-using Domain.Entities;
+using Application.Users.Dtos;
+using Domain.Users.Entities;
 using Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

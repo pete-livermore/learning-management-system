@@ -1,7 +1,7 @@
 namespace Infrastructure.Persistence.EntityConfigurations;
 
-using Domain.Entities;
-using Domain.Enums;
+using Domain.Users.Entities;
+using Domain.Users.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

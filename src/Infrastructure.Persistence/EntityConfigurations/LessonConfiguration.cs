@@ -1,5 +1,4 @@
-using System;
-using Domain.Entities;
+using Domain.Lessons.Entities;
 using Infrastructure.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

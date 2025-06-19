@@ -1,5 +1,5 @@
 using Application.Common.Interfaces.Repositories;
-using Domain.Entities;
+using Domain.Uploads.Entities;
 using Infrastructure.Persistence.Contexts;
 
 namespace Infrastructure.Persistence.Repositories

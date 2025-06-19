@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using Application.UseCases.Security.Dtos;
-using Application.UseCases.Security.Interfaces;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
 using Infrastructure.Identity.Extensions;
 using Microsoft.AspNetCore.Http;
 

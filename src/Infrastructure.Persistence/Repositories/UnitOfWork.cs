@@ -6,17 +6,20 @@ using System.Threading.Tasks;
 using Application.Common.Errors;
 using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
 using Infrastructure.Persistence.Contexts;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 public class UnitOfWork : IUnitOfWork
 {
     private readonly LearningManagementSystemDbContext _context;
+    private readonly IMediator _mediator;
 
-    public UnitOfWork(LearningManagementSystemDbContext context)
+    public UnitOfWork(LearningManagementSystemDbContext context, IMediator mediator)
     {
         _context = context;
+        _mediator = mediator;
     }
 
     private Error GetDbUpdateError(DbUpdateException ex)

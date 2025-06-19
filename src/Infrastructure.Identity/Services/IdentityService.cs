@@ -1,11 +1,9 @@
-using System.Text.Json;
 using Application.Common.Errors;
 using Application.Common.Errors.Factories;
-using Application.Common.Interfaces.Security;
 using Application.Common.Interfaces.Token;
-using Application.UseCases.Security.Dtos;
-using Application.UseCases.Users.Dtos;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
 using Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

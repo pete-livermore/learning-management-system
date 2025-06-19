@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Application.Common.Errors;
 using Application.Common.Errors.Factories;
-using Application.Common.Interfaces.Security;
-using Application.UseCases.Security.Dtos;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
 using Bogus;
 using Infrastructure.Identity.Models;
 using Infrastructure.Identity.Services;
