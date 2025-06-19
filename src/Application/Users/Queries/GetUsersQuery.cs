@@ -2,14 +2,15 @@ using System.Text.Json;
 using Application.Common.Dtos;
 using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Repositories;
-using Application.UseCases.Security.Interfaces;
-using Application.UseCases.Users.Dtos;
-using Application.UseCases.Users.Errors;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
+using Application.Security.Interfaces;
+using Application.Users.Dtos;
+using Application.Users.Errors;
 using Domain.Enums;
+using Domain.Users.Enums;
 using MediatR;
 
-namespace Application.UseCases.Users.Queries;
+namespace Application.Users.Queries;
 
 public record class GetUsersQuery : IRequest<Result<PaginatedList<UserDto>>>
 {
@@ -35,7 +36,7 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Result<Pagina
     }
 
     public async Task<Result<PaginatedList<UserDto>>> Handle(
-        GetUsersQuery query,
+        GetUsersQuery request,
         CancellationToken cancellationToken
     )
     {
@@ -47,8 +48,8 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Result<Pagina
             return Result<PaginatedList<UserDto>>.Failure(UserErrors.Forbidden());
         }
 
-        var filters = query.Filters;
-        var pagination = query.Pagination;
+        var filters = request.Filters;
+        var pagination = request.Pagination;
         var filtersString = JsonSerializer.Serialize(filters);
         var cacheKey = $"Users_{filtersString}";
         var cachedUsersList = await _cacheService.GetValueAsync<PaginatedList<UserDto>>(

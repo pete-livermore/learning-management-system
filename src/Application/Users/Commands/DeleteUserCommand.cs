@@ -1,13 +1,12 @@
-using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Security;
-using Application.UseCases.Security.Interfaces;
-using Application.UseCases.Users.Errors;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
+using Application.Security.Interfaces;
+using Application.Users.Errors;
 using Domain.Enums;
+using Domain.Users.Enums;
 using MediatR;
 
-namespace Application.UseCases.Users.Commands;
+namespace Application.Users.Commands;
 
 public record class DeleteUserCommand : IRequest<Result>
 {

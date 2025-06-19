@@ -1,19 +1,21 @@
-using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Security;
-using Application.UseCases.Security.Interfaces;
-using Application.UseCases.Users.Dtos;
-using Application.UseCases.Users.Errors;
-using Application.Wrappers.Results;
-using Domain.Enums;
+using Application.Common.Wrappers.Results;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
+using Application.Users.Dtos;
+using Application.Users.Errors;
+using Domain.Users.Enums;
 using MediatR;
 
-namespace Application.UseCases.Users.Commands;
+namespace Application.Users.Commands;
 
 public record class ReplaceUserCommand : IRequest<Result<UserDto>>
 {
     public required int UserId { get; init; }
-    public required ReplaceUserDto ReplaceCommand { get; init; }
+    public required string FirstName { get; init; }
+    public required string LastName { get; init; }
+    public required string Email { get; init; }
+    public required string Password { get; init; }
 }
 
 public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Result<UserDto>>
@@ -42,7 +44,6 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
     )
     {
         var userId = request.UserId;
-        var replaceUserDto = request.ReplaceCommand;
         var userEntity = await _usersRepository.FindByIdAsync(userId);
 
         if (userEntity is null)
@@ -57,10 +58,7 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
             return Result<UserDto>.Failure(UserErrors.Forbidden());
         }
 
-        var updateApplicationUserDto = new UpdateApplicationUserDto()
-        {
-            Email = replaceUserDto.Email,
-        };
+        var updateApplicationUserDto = new UpdateApplicationUserDto() { Email = request.Email };
         var updateAplicationUserResult = await _identityService.UpdateUserAsync(
             userEntity.ApplicationUserId,
             updateApplicationUserDto
@@ -71,9 +69,9 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
             return Result<UserDto>.Failure([.. updateAplicationUserResult.Errors]);
         }
 
-        userEntity.Email = replaceUserDto.Email;
-        userEntity.FirstName = replaceUserDto.FirstName;
-        userEntity.LastName = replaceUserDto.LastName;
+        userEntity.Email = request.Email;
+        userEntity.FirstName = request.FirstName;
+        userEntity.LastName = request.LastName;
         userEntity.Role = userEntity.Role;
 
         _usersRepository.Update(userEntity);

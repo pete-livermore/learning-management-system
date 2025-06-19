@@ -1,12 +1,12 @@
 using Application.Common.Interfaces.Repositories;
-using Application.UseCases.Security.Interfaces;
-using Application.UseCases.Users.Dtos;
-using Application.UseCases.Users.Errors;
-using Application.Wrappers.Results;
-using Domain.Enums;
+using Application.Common.Wrappers.Results;
+using Application.Security.Interfaces;
+using Application.Users.Dtos;
+using Application.Users.Errors;
+using Domain.Users.Enums;
 using MediatR;
 
-namespace Application.UseCases.Users.Queries;
+namespace Application.Users.Queries;
 
 public record GetUserByIdQuery : IRequest<Result<UserDto>>
 {

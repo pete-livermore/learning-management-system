@@ -1,18 +1,24 @@
 using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Security;
-using Application.UseCases.Security.Dtos;
-using Application.UseCases.Users.Dtos;
-using Application.Wrappers.Results;
-using Domain.Entities;
+using Application.Common.Wrappers.Results;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
+using Application.Users.Dtos;
 using Domain.Enums;
+using Domain.Users.Entities;
+using Domain.Users.Enums;
+using Domain.Users.Events;
 using MediatR;
 
-namespace Application.UseCases.Users.Commands;
+namespace Application.Users.Commands;
 
 public record class CreateUserCommand : IRequest<Result<UserDto>>
 {
-    public required CreateUserDto CreateCommand { get; init; }
+    public required string FirstName { get; init; }
+    public required string LastName { get; init; }
+    public required string Email { get; init; }
+    public required string Password { get; init; }
+    public required string Role { get; set; }
 }
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<UserDto>>
@@ -37,14 +43,21 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
         CancellationToken cancellationToken
     )
     {
-        var createUserDto = request.CreateCommand;
-        var userEmail = createUserDto.Email;
+        var userEmail = request.Email;
+        var existingDomainUser = await _usersRepository.FindByEmailAsync(userEmail);
+
+        if (existingDomainUser is not null)
+        {
+            return Result<UserDto>.Failure(
+                ResourceError.Conflict($"The user with {userEmail} already exists")
+            );
+        }
 
         var createApplicationUserDto = new CreateApplicationUserDto()
         {
-            Email = createUserDto.Email,
-            Password = createUserDto.Password,
-            Roles = [createUserDto.Role],
+            Email = request.Email,
+            Password = request.Password,
+            Roles = [request.Role],
         };
         var createApplicationUserResult = await _identityService.CreateUserAsync(
             createApplicationUserDto
@@ -55,26 +68,19 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             return Result<UserDto>.Failure([.. createApplicationUserResult.Errors]);
         }
 
-        var existingDomainUser = await _usersRepository.FindByEmailAsync(userEmail);
-
-        if (existingDomainUser is not null)
-        {
-            return Result<UserDto>.Failure(
-                ResourceError.Conflict($"The user with {userEmail} already exists")
-            );
-        }
-
         var applicationUserDto = createApplicationUserResult.Value;
-        var domainUser = new User()
+
+        var newDomainUser = new User()
         {
             Email = userEmail,
-            FirstName = createUserDto.FirstName,
-            LastName = createUserDto.LastName,
-            Role = Enum.Parse<UserRole>(createUserDto.Role),
-            ApplicationUserId = applicationUserDto.Id, // Crucial link
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Role = Enum.Parse<UserRole>(request.Role),
+            ApplicationUserId = applicationUserDto.Id,
         };
 
-        _usersRepository.Add(domainUser);
+        _usersRepository.Add(newDomainUser);
+        newDomainUser.AddDomainEvent(new UserCreatedEvent(newDomainUser.Id));
         var saveResult = await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsFailure)
@@ -84,11 +90,11 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
 
         var newUserDto = new UserDto()
         {
-            Email = domainUser.Email,
-            FirstName = domainUser.FirstName,
-            LastName = domainUser.LastName,
-            Role = domainUser.Role.ToString(),
-            Id = domainUser.Id,
+            Email = newDomainUser.Email,
+            FirstName = newDomainUser.FirstName,
+            LastName = newDomainUser.LastName,
+            Role = newDomainUser.Role.ToString(),
+            Id = newDomainUser.Id,
         };
 
         return Result<UserDto>.Success(newUserDto);

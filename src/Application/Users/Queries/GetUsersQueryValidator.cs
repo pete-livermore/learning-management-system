@@ -1,4 +1,4 @@
-namespace Application.UseCases.Users.Queries;
+namespace Application.Users.Queries;
 
 using FluentValidation;
 

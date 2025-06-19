@@ -1,4 +1,4 @@
-namespace Application.UseCases.Users.Dtos;
+namespace Application.Users.Dtos;
 
 public record UserDto
 {

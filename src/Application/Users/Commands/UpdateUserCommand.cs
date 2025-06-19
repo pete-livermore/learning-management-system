@@ -1,16 +1,20 @@
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Security;
-using Application.UseCases.Users.Dtos;
-using Application.UseCases.Users.Errors;
-using Application.Wrappers.Results;
+using Application.Common.Wrappers.Results;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
+using Application.Users.Dtos;
+using Application.Users.Errors;
 using MediatR;
 
-namespace Application.UseCases.Users.Commands;
+namespace Application.Users.Commands;
 
 public record class UpdateUserCommand : IRequest<Result<UserDto>>
 {
     public required int UserId { get; init; }
-    public required UpdateUserDto UpdateCommand { get; init; }
+    public string? FirstName { get; init; }
+    public string? LastName { get; init; }
+    public string? Email { get; init; }
+    public string? Password { get; init; }
 }
 
 public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result<UserDto>>
@@ -43,26 +47,24 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             return Result<UserDto>.Failure(UserErrors.NotFound(userId));
         }
 
-        var updateUserDto = request.UpdateCommand;
-
-        if (updateUserDto.Email is not null)
+        if (request.Email is not null)
         {
-            existingUser.Email = updateUserDto.Email;
+            existingUser.Email = request.Email;
         }
 
-        if (updateUserDto.FirstName is not null)
+        if (request.FirstName is not null)
         {
-            existingUser.FirstName = updateUserDto.FirstName;
+            existingUser.FirstName = request.FirstName;
         }
 
-        if (updateUserDto.LastName is not null)
+        if (request.LastName is not null)
         {
-            existingUser.LastName = updateUserDto.LastName;
+            existingUser.LastName = request.LastName;
         }
 
         await _identityService.UpdateUserAsync(
             existingUser.ApplicationUserId,
-            new UpdateApplicationUserDto() { Email = updateUserDto.Email }
+            new UpdateApplicationUserDto() { Email = request.Email }
         );
 
         _usersRepository.Update(existingUser);

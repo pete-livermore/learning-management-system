@@ -1,8 +1,7 @@
-using System;
 using Application.Common.Errors;
 using Application.Common.Errors.Factories;
 
-namespace Application.UseCases.Users.Errors;
+namespace Application.Users.Errors;
 
 public static class UserErrors
 {
