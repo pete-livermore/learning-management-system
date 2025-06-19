@@ -1,11 +1,11 @@
 namespace WebApi;
 
 using Application;
+using Infrastructure.Cache;
 using Infrastructure.Identity;
 using Infrastructure.Identity.Models;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Contexts;
-using Infrastructure.Shared;
 using Infrastructure.Uploads;
 using Microsoft.AspNetCore.Identity;
 using WebApi.Extensions;
@@ -31,7 +31,7 @@ public class Startup
             .AddEntityFrameworkStores<LearningManagementSystemDbContext>()
             .AddDefaultTokenProviders();
         services.AddIdentityInfrastructure(Configuration);
-        services.AddSharedInfrastructure(Configuration);
+        services.AddCacheInfrastructure(Configuration);
         services.AddUploadsInfrastructure();
         services.AddControllers();
         services.AddApiVersioningExtension();
