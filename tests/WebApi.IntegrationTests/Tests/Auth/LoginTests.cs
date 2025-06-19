@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using Application.UseCases.Security.Dtos;
+using WebApi.Dtos.Auth;
 using WebApi.IntegrationTests.Factories;
 using WebApi.IntegrationTests.Fixtures;
 
@@ -35,9 +35,9 @@ public class LoginTests
         string testEmail = testDtoFixture.Email;
         string testPassword = testDtoFixture.Password;
 
-        LoginDto loginDto = new() { Email = testEmail, Password = testPassword };
-        var serializedLoginDto = JsonSerializer.Serialize(loginDto);
-        var httpContent = new StringContent(serializedLoginDto, Encoding.UTF8, "application/json");
+        LoginRequest request = new() { Email = testEmail, Password = testPassword };
+        var serializedrequest = JsonSerializer.Serialize(request);
+        var httpContent = new StringContent(serializedrequest, Encoding.UTF8, "application/json");
 
         var response = await _client.PostAsync("/v1/auth/login", httpContent);
 
@@ -66,9 +66,13 @@ public class LoginTests
     public async Task Login_ReturnsUnauthorized_WhenPasswordIsIncorrect()
     {
         var testDtoFixture = TestUserFixture.Admin;
-        LoginDto loginDto = new() { Email = testDtoFixture.Email, Password = "incorrectpassword" };
+        LoginRequest loginRequest = new()
+        {
+            Email = testDtoFixture.Email,
+            Password = "incorrectpassword",
+        };
         var httpContent = new StringContent(
-            JsonSerializer.Serialize(loginDto),
+            JsonSerializer.Serialize(loginRequest),
             Encoding.UTF8,
             "application/json"
         );
