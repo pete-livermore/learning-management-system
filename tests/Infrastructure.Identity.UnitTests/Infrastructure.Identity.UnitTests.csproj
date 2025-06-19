@@ -31,7 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Application/Application.csproj" />
     <ProjectReference Include="../../src/Infrastructure.Identity/Infrastructure.Identity.csproj" />
-    <ProjectReference Include="../Shared/Shared.csproj" />
+    <ProjectReference Include="../Tests.Common/Tests.Common.csproj" />
   </ItemGroup>
 
 </Project>
