@@ -1,6 +1,7 @@
-using Domain.ValueObjects;
+using Domain.Common;
+using Domain.Uploads;
 
-namespace Domain.Entities;
+namespace Domain.Lessons.Entities;
 
 public abstract class LessonContent : BaseEntity
 {

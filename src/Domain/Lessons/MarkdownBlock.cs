@@ -1,6 +1,6 @@
 using Domain.Enums;
 
-namespace Domain.ValueObjects;
+namespace Domain.Lessons;
 
 public class MarkdownBlock
 {
