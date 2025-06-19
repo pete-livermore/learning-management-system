@@ -1,6 +1,6 @@
 using Domain.Common;
 
-namespace Domain.Uploads
+namespace Domain.Uploads.Entities
 {
     public class UploadFile : BaseEntity
     {
