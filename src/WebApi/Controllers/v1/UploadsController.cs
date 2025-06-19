@@ -1,5 +1,5 @@
-using Application.UseCases.Uploads.Commands;
-using Application.UseCases.Uploads.Dtos;
+using Application.Uploads.Commands;
+using Application.Uploads.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,11 +1,13 @@
 using System.Net.Mime;
 using Application.Common.Dtos;
-using Application.UseCases.Users.Commands;
-using Application.UseCases.Users.Dtos;
-using Application.UseCases.Users.Queries;
+using Application.Users.Commands;
+using Application.Users.Dtos;
+using Application.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Contracts;
+using WebApi.Contracts.Users;
 
 namespace WebApi.Controllers.v1
 {
@@ -29,10 +31,17 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CreateUserDto createUserDto)
+        public async Task<ActionResult> Create([FromBody] CreateUserRequest request)
         {
             var createResult = await _mediator.Send(
-                new CreateUserCommand() { CreateCommand = createUserDto }
+                new CreateUserCommand()
+                {
+                    Email = request.Email,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Password = request.Password,
+                    Role = request.Role,
+                }
             );
 
             _logger.LogWarning("Create result: @{createResult}", createResult);
@@ -50,13 +59,13 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ApiResponse>> GetUsers([FromQuery] GetUsersQueryDto query)
+        public async Task<ActionResult<ApiResponse>> GetUsers([FromQuery] GetUsersRequest request)
         {
-            var filters = new UserFiltersDto() { Email = query.Filters.Email };
+            var filters = new UserFiltersDto() { Email = request.Filters?.Email };
             var paginationParams = new PaginationParamsDto()
             {
-                PageIndex = query.Start ?? 1,
-                PageSize = query.Pages ?? 30,
+                PageIndex = request.Start ?? 1,
+                PageSize = request.Pages ?? 30,
             };
 
             var getUsersResult = await _mediator.Send(
@@ -88,10 +97,17 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPatch("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto updateUserDto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request)
         {
             var updateResult = await _mediator.Send(
-                new UpdateUserCommand() { UserId = id, UpdateCommand = updateUserDto }
+                new UpdateUserCommand()
+                {
+                    UserId = id,
+                    Email = request.Email,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Password = request.Password,
+                }
             );
 
             if (updateResult.IsFailure)
@@ -106,10 +122,17 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Replace(int id, [FromBody] ReplaceUserDto replaceUserDto)
+        public async Task<IActionResult> Replace(int id, [FromBody] ReplaceUserRequest request)
         {
             var replaceResult = await _mediator.Send(
-                new ReplaceUserCommand() { UserId = id, ReplaceCommand = replaceUserDto }
+                new ReplaceUserCommand()
+                {
+                    UserId = id,
+                    Email = request.Email,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Password = request.Password,
+                }
             );
 
             if (replaceResult.IsFailure)

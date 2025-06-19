@@ -1,6 +1,6 @@
-using Application.UseCases.Security.Commands;
-using Application.UseCases.Security.Dtos;
+using Application.Security.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.v1
@@ -18,10 +18,10 @@ namespace WebApi.Controllers.v1
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var loginResult = await _mediator.Send(
-                new LoginCommand() { Email = loginDto.Email, Password = loginDto.Password }
+                new LoginCommand() { Email = request.Email, Password = request.Password }
             );
 
             if (loginResult.IsFailure)
