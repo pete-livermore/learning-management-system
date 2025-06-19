@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Repositories;
+using Application.Security.Interfaces;
 using Application.UnitTests.Helpers.Factories;
-using Application.UseCases.Security.Interfaces;
-using Application.UseCases.Uploads.Commands;
+using Application.Uploads.Commands;
 using Application.UseCases.Uploads.Interfaces;
 using Moq;
 
-namespace Application.UnitTests.Tests.UseCases.Uploads.Commands
+namespace Application.UnitTests.Tests.Uploads.Commands
 {
     public class CreateFileCommandTests
     {

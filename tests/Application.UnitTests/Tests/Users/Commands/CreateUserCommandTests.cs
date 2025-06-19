@@ -1,16 +1,15 @@
 using Application.Common.Errors;
 using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Security;
-using Application.UseCases.Security.Dtos;
-using Application.UseCases.Users.Commands;
-using Application.UseCases.Users.Dtos;
-using Application.Wrappers.Results;
-using Domain.Entities;
-using Domain.Enums;
+using Application.Common.Wrappers.Results;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
+using Application.Users.Commands;
+using Domain.Users.Entities;
+using Domain.Users.Enums;
 using Moq;
 
-namespace Application.UnitTests.Tests.UseCases.Users.Commands;
+namespace Application.UnitTests.Tests.Users.Commands;
 
 public class CreateUserCommandTests
 {
@@ -47,7 +46,7 @@ public class CreateUserCommandTests
             .Setup(i => i.CreateUserAsync(It.IsAny<CreateApplicationUserDto>()))
             .ReturnsAsync(successResult);
 
-        var testDto = new CreateUserDto()
+        var command = new CreateUserCommand()
         {
             FirstName = "test",
             LastName = "user",
@@ -56,16 +55,14 @@ public class CreateUserCommandTests
             Role = UserRole.Administrator.ToString(),
         };
 
-        var command = new CreateUserCommand() { CreateCommand = testDto };
-
         _repositoryMock
-            .Setup(ur => ur.FindByEmailAsync(testDto.Email))
+            .Setup(ur => ur.FindByEmailAsync(command.Email))
             .ReturnsAsync(
                 new User
                 {
-                    Email = testDto.Email,
-                    FirstName = testDto.FirstName,
-                    LastName = testDto.LastName,
+                    Email = command.Email,
+                    FirstName = command.FirstName,
+                    LastName = command.LastName,
                     ApplicationUserId = Guid.NewGuid(),
                     Role = UserRole.Learner,
                 }
@@ -82,13 +79,13 @@ public class CreateUserCommandTests
     public async Task ShouldReturnSuccess_WhenUserIsValid()
     {
         var handler = CreateHandler();
-        string testEmail = "test_email@email.com";
+        string testCurrentUserEmail = "test_email@email.com";
         var applicationUserId = Guid.NewGuid();
 
         var applicationUserDto = new ApplicationUserDto()
         {
             Id = applicationUserId,
-            Email = testEmail,
+            Email = testCurrentUserEmail,
             Roles = [UserRole.Administrator.ToString()],
         };
 
@@ -98,33 +95,35 @@ public class CreateUserCommandTests
             .Setup(i => i.CreateUserAsync(It.IsAny<CreateApplicationUserDto>()))
             .ReturnsAsync(successResult);
 
-        var testDto = new CreateUserDto()
-        {
-            Email = "test@example.com",
-            Password = "password",
-            FirstName = "Test",
-            LastName = "User",
-            Role = UserRole.Learner.ToString(),
-        };
+        string testEmail = "test@example.com";
+        string testPassword = "password";
+        string testFirstName = "Test";
+        string testLastName = "User";
+        var testRole = UserRole.Learner;
 
         var newUser = new User
         {
-            Email = testDto.Email,
-            FirstName = testDto.FirstName,
-            LastName = testDto.LastName,
-            Role = UserRole.Learner,
+            Email = testEmail,
+            FirstName = testFirstName,
+            LastName = testLastName,
+            Role = testRole,
             ApplicationUserId = applicationUserId,
         };
 
-        _repositoryMock
-            .Setup(repo => repo.FindByEmailAsync(testDto.Email))
-            .ReturnsAsync((User?)null);
+        _repositoryMock.Setup(repo => repo.FindByEmailAsync(testEmail)).ReturnsAsync((User?)null);
 
         _unitOfWorkMock
             .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<int>.Success(1));
 
-        var testCommand = new CreateUserCommand() { CreateCommand = testDto };
+        var testCommand = new CreateUserCommand()
+        {
+            Email = testEmail,
+            Password = testPassword,
+            FirstName = testFirstName,
+            LastName = testLastName,
+            Role = testRole.ToString(),
+        };
         var result = await handler.Handle(testCommand, new CancellationToken());
 
         _repositoryMock.Verify(r => r.Add(It.IsAny<User>()), Times.Once);

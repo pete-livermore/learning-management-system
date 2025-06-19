@@ -1,10 +1,9 @@
-using Application.UseCases.Users.Commands;
-using Application.UseCases.Users.Dtos;
-using Domain.Enums;
+using Application.Users.Commands;
+using Domain.Users.Enums;
 using FluentValidation;
 using FluentValidation.TestHelper;
 
-namespace Application.UnitTests.Tests.UseCases.Users.Commands
+namespace Application.UnitTests.Tests.Users.Commands
 {
     public class CreateUserCommandValidatorTests
     {
@@ -14,7 +13,7 @@ namespace Application.UnitTests.Tests.UseCases.Users.Commands
         [Fact]
         public void ShouldFail_WhenFirstNameIsEmpty()
         {
-            var testDto = new CreateUserDto()
+            var command = new CreateUserCommand()
             {
                 FirstName = "",
                 LastName = "user",
@@ -22,18 +21,16 @@ namespace Application.UnitTests.Tests.UseCases.Users.Commands
                 Password = "password",
                 Role = UserRole.Administrator.ToString(),
             };
-
-            var command = new CreateUserCommand() { CreateCommand = testDto };
             var result = _validator.TestValidate(command);
 
-            result.ShouldHaveValidationErrorFor(c => c.CreateCommand.FirstName);
+            result.ShouldHaveValidationErrorFor(c => c.FirstName);
             Assert.False(result.IsValid);
         }
 
         [Fact]
         public void ShouldFail_WhenLastNameIsEmpty()
         {
-            var testDto = new CreateUserDto()
+            var command = new CreateUserCommand()
             {
                 FirstName = "test",
                 LastName = "",
@@ -41,18 +38,16 @@ namespace Application.UnitTests.Tests.UseCases.Users.Commands
                 Password = "password",
                 Role = UserRole.Administrator.ToString(),
             };
-
-            var command = new CreateUserCommand() { CreateCommand = testDto };
             var result = _validator.TestValidate(command);
 
-            result.ShouldHaveValidationErrorFor(c => c.CreateCommand.LastName);
+            result.ShouldHaveValidationErrorFor(c => c.LastName);
             Assert.False(result.IsValid);
         }
 
         [Fact]
         public void ShouldFail_WhenEmailIsInvalidFormat()
         {
-            var testDto = new CreateUserDto()
+            var command = new CreateUserCommand()
             {
                 FirstName = "test",
                 LastName = "user",
@@ -60,18 +55,16 @@ namespace Application.UnitTests.Tests.UseCases.Users.Commands
                 Password = "password",
                 Role = UserRole.Administrator.ToString(),
             };
-
-            var command = new CreateUserCommand() { CreateCommand = testDto };
             var result = _validator.TestValidate(command);
 
-            result.ShouldHaveValidationErrorFor(c => c.CreateCommand.Email);
+            result.ShouldHaveValidationErrorFor(c => c.Email);
             Assert.False(result.IsValid);
         }
 
         [Fact]
         public void ShouldFail_WhenPasswordIsEmpty()
         {
-            var testDto = new CreateUserDto()
+            var command = new CreateUserCommand()
             {
                 FirstName = "test",
                 LastName = "user",
@@ -79,18 +72,16 @@ namespace Application.UnitTests.Tests.UseCases.Users.Commands
                 Password = "",
                 Role = UserRole.Administrator.ToString(),
             };
-
-            var command = new CreateUserCommand() { CreateCommand = testDto };
             var result = _validator.TestValidate(command);
 
-            result.ShouldHaveValidationErrorFor(c => c.CreateCommand.Password);
+            result.ShouldHaveValidationErrorFor(c => c.Password);
             Assert.False(result.IsValid);
         }
 
         [Fact]
         public void ShouldFail_WhenRoleIsInvalid()
         {
-            var testDto = new CreateUserDto()
+            var command = new CreateUserCommand()
             {
                 FirstName = "test",
                 LastName = "user",
@@ -98,18 +89,16 @@ namespace Application.UnitTests.Tests.UseCases.Users.Commands
                 Password = "password",
                 Role = "hello",
             };
-
-            var command = new CreateUserCommand() { CreateCommand = testDto };
             var result = _validator.TestValidate(command);
 
-            result.ShouldHaveValidationErrorFor(c => c.CreateCommand.Role);
+            result.ShouldHaveValidationErrorFor(c => c.Role);
             Assert.False(result.IsValid);
         }
 
         [Fact]
         public void ShouldPass_WhenDataIsValid()
         {
-            var testDto = new CreateUserDto()
+            var command = new CreateUserCommand()
             {
                 FirstName = "test",
                 LastName = "user",
@@ -117,8 +106,6 @@ namespace Application.UnitTests.Tests.UseCases.Users.Commands
                 Password = "password",
                 Role = UserRole.Administrator.ToString(),
             };
-
-            var command = new CreateUserCommand() { CreateCommand = testDto };
             var result = _validator.TestValidate(command);
 
             result.ShouldNotHaveAnyValidationErrors();

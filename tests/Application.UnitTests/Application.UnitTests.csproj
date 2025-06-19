@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <Folder Include="Helpers/Factories/" />
-    <Folder Include="Tests/" />
   </ItemGroup>
 
 </Project>

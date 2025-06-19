@@ -1,10 +1,10 @@
 using Application.UnitTests.Helpers.Factories;
-using Application.UseCases.Uploads.Commands;
-using Application.UseCases.Uploads.Dtos;
+using Application.Uploads.Commands;
+using Application.Uploads.Dtos;
 using FluentAssertions;
 using Moq;
 
-namespace Application.UnitTests.Tests.UseCases.Uploads.Commands
+namespace Application.UnitTests.Tests.Uploads.Commands
 {
     public class CreateFileCommandValidatorTests
     {

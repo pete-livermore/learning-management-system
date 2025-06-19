@@ -1,14 +1,14 @@
 using Application.Common.Errors;
 using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Repositories;
-using Application.UseCases.Security.Dtos;
-using Application.UseCases.Security.Interfaces;
-using Application.UseCases.Users.Queries;
-using Domain.Entities;
-using Domain.Enums;
+using Application.Security.Dtos;
+using Application.Security.Interfaces;
+using Application.Users.Queries;
+using Domain.Users.Entities;
+using Domain.Users.Enums;
 using Moq;
 
-namespace Application.UnitTests.Tests.UseCases.Users.Queries
+namespace Application.UnitTests.Tests.ries
 {
     public class GetUserByIdQueryTests
     {
