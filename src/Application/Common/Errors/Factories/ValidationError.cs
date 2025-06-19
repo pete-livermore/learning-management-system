@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Common.Errors.Factories;
 
 public static class ValidationError
