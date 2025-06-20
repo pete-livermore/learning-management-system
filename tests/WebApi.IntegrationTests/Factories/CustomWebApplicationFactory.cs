@@ -1,7 +1,7 @@
 using Application.Security.Interfaces;
 using Domain.Users.Enums;
 using Infrastructure.Persistence.Contexts;
-using Infrastructure.Persistence.Helpers;
+using Infrastructure.Persistence.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
