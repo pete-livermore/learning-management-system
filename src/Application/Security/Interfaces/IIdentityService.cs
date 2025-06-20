@@ -16,6 +16,7 @@ namespace Application.Security.Interfaces
         Task<Result<ApplicationRoleDto>> CreateRoleAsync(
             CreateApplicationRoleDto createApplicationRoleDto
         );
+        Task<Result<ApplicationRoleDto>> FindRoleByNameAsync(string roleName);
         Task<Result<List<string>>> GetUserRolesAsync(Guid userId);
         Task<Result<string>> AuthenticateUserAsync(string userEmail, string password);
     }
