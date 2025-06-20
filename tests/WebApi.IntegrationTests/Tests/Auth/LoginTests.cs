@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using WebApi.Dtos.Auth;
+using WebApi.Contracts.Auth;
 using WebApi.IntegrationTests.Factories;
 using WebApi.IntegrationTests.Fixtures;
 
