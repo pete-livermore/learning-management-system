@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Common.Errors;
 using Application.Common.Errors.Factories;
 using Application.Common.Interfaces.Token;
@@ -266,7 +267,6 @@ public class IdentityService : IIdentityService
         }
 
         var isValidPassword = await _userManager.CheckPasswordAsync(applicationUser, password);
-
         if (!isValidPassword)
         {
             return Result<string>.Failure(
@@ -289,5 +289,21 @@ public class IdentityService : IIdentityService
         );
 
         return Result<string>.Success(token);
+    }
+
+    public async Task<Result<ApplicationRoleDto>> FindRoleByNameAsync(string roleName)
+    {
+        var role = await _roleManager.FindByNameAsync(roleName);
+
+        if (role is null)
+        {
+            return Result<ApplicationRoleDto>.Failure(
+                ResourceError.NotFound($"Role {roleName} does not exist")
+            );
+        }
+
+        var applicationRoleDto = new ApplicationRoleDto() { Name = role.Name! };
+
+        return Result<ApplicationRoleDto>.Success(applicationRoleDto);
     }
 }
