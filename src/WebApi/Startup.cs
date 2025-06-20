@@ -1,5 +1,3 @@
-namespace WebApi;
-
 using Application;
 using Infrastructure.Cache;
 using Infrastructure.Identity;
@@ -10,6 +8,8 @@ using Infrastructure.Uploads;
 using Microsoft.AspNetCore.Identity;
 using WebApi.Extensions;
 using WebApi.Services;
+
+namespace WebApi;
 
 public class Startup
 {
