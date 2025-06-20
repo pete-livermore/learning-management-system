@@ -5,7 +5,7 @@ using Domain.Users.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Persistence.Helpers;
+namespace Infrastructure.Persistence.Services;
 
 public sealed record UserSeedDto
 {
@@ -35,6 +35,16 @@ public class DataSeeder
 
     public async Task SeedApplicationRoleAsync(UserRole userRole)
     {
+        var findRoleResult = await _identityService.FindRoleByNameAsync(userRole.ToString());
+
+        if (findRoleResult.IsSuccess)
+        {
+            _logger.LogInformation(
+                "Application role {name} not seeded because it already exists",
+                findRoleResult.Value.Name
+            );
+            return;
+        }
         var role = new CreateApplicationRoleDto() { Name = userRole.ToString() };
         var createResult = await _identityService.CreateRoleAsync(role);
 
@@ -49,12 +59,12 @@ public class DataSeeder
     public async Task SeedUserAsync(UserSeedDto userSeedDto)
     {
         var userEmail = userSeedDto.Email;
-        var existingUser = await _identityService.FindUserByEmailAsync(userEmail);
+        var findUserResult = await _identityService.FindUserByEmailAsync(userEmail);
 
-        if (existingUser is not null)
+        if (findUserResult.IsSuccess)
         {
             _logger.LogInformation(
-                "Application user with email {userEmail} already exists",
+                "Application user with email {userEmail} not seeded because it already exists",
                 userEmail
             );
             return;
