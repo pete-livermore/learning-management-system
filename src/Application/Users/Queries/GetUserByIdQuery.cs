@@ -35,7 +35,7 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<
         var userId = request.UserId;
         var currentUser = _currentUserProvider.GetCurrentUser();
 
-        var user = await _usersRepository.FindByIdAsync(userId);
+        var user = await _usersRepository.FindByIdAsync(userId, cancellationToken);
 
         if (user is null)
         {

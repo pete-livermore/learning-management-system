@@ -62,7 +62,11 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Result<Pagina
             return Result<PaginatedList<UserDto>>.Success(cachedUsersList);
         }
 
-        var (users, totalPages) = await _usersRepository.FindManyAsync(filters, pagination);
+        var (users, totalPages) = await _usersRepository.FindManyAsync(
+            filters,
+            pagination,
+            cancellationToken
+        );
         var userDtos = users
             .Select(user => new UserDto()
             {

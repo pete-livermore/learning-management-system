@@ -40,7 +40,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
     )
     {
         var userId = request.UserId;
-        var existingUser = await _usersRepository.FindByIdAsync(userId);
+        var existingUser = await _usersRepository.FindByIdAsync(userId, cancellationToken);
 
         if (existingUser is null)
         {

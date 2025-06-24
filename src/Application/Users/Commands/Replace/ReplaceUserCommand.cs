@@ -45,7 +45,7 @@ public class ReplaceUserCommandHandler : IRequestHandler<ReplaceUserCommand, Res
     )
     {
         var userId = request.UserId;
-        var userEntity = await _usersRepository.FindByIdAsync(userId);
+        var userEntity = await _usersRepository.FindByIdAsync(userId, cancellationToken);
 
         if (userEntity is null)
         {
