@@ -1,5 +1,5 @@
 using Domain.Common;
-using Domain.Enums;
+using Domain.Lessons.Entities;
 using Domain.Users.Enums;
 
 namespace Domain.Users.Entities
@@ -12,5 +12,6 @@ namespace Domain.Users.Entities
         public required string Email { get; set; }
         public required UserRole Role { get; set; }
         public required Guid ApplicationUserId { get; set; }
+        public ICollection<LessonSectionProgress> LessonSectionProgresses { get; set; } = [];
     }
 }
