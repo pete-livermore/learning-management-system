@@ -2,11 +2,10 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Wrappers.Results;
 using Application.Security.Interfaces;
 using Application.Users.Errors;
-using Domain.Enums;
 using Domain.Users.Enums;
 using MediatR;
 
-namespace Application.Users.Commands;
+namespace Application.Users.Commands.Delete;
 
 public record class DeleteUserCommand : IRequest<Result>
 {

@@ -4,13 +4,12 @@ using Application.Common.Wrappers.Results;
 using Application.Security.Dtos;
 using Application.Security.Interfaces;
 using Application.Users.Dtos;
-using Domain.Enums;
 using Domain.Users.Entities;
 using Domain.Users.Enums;
 using Domain.Users.Events;
 using MediatR;
 
-namespace Application.Users.Commands;
+namespace Application.Users.Commands.Create;
 
 public record class CreateUserCommand : IRequest<Result<UserDto>>
 {
@@ -44,7 +43,10 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
     )
     {
         var userEmail = request.Email;
-        var existingDomainUser = await _usersRepository.FindByEmailAsync(userEmail);
+        var existingDomainUser = await _usersRepository.FindByEmailAsync(
+            userEmail,
+            cancellationToken
+        );
 
         if (existingDomainUser is not null)
         {
@@ -60,7 +62,8 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             Roles = [request.Role],
         };
         var createApplicationUserResult = await _identityService.CreateUserAsync(
-            createApplicationUserDto
+            createApplicationUserDto,
+            cancellationToken
         );
 
         if (createApplicationUserResult.IsFailure)
