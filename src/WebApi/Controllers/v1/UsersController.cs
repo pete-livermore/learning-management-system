@@ -1,6 +1,8 @@
 using System.Net.Mime;
 using Application.Common.Dtos;
 using Application.Users.Commands;
+using Application.Users.Commands.Create;
+using Application.Users.Commands.Delete;
 using Application.Users.Dtos;
 using Application.Users.Queries;
 using MediatR;
@@ -31,7 +33,10 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CreateUserRequest request)
+        public async Task<ActionResult> Create(
+            [FromBody] CreateUserRequest request,
+            CancellationToken cancellationToken
+        )
         {
             var createResult = await _mediator.Send(
                 new CreateUserCommand()
@@ -41,7 +46,8 @@ namespace WebApi.Controllers.v1
                     LastName = request.LastName,
                     Password = request.Password,
                     Role = request.Role,
-                }
+                },
+                cancellationToken
             );
 
             _logger.LogWarning("Create result: @{createResult}", createResult);
@@ -59,7 +65,10 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ApiResponse>> GetUsers([FromQuery] GetUsersRequest request)
+        public async Task<ActionResult<ApiResponse>> GetUsers(
+            [FromQuery] GetUsersRequest request,
+            CancellationToken cancellationToken
+        )
         {
             var filters = new UserFiltersDto() { Email = request.Filters?.Email };
             var paginationParams = new PaginationParamsDto()
@@ -69,7 +78,8 @@ namespace WebApi.Controllers.v1
             };
 
             var getUsersResult = await _mediator.Send(
-                new GetUsersQuery() { Filters = filters, Pagination = paginationParams }
+                new GetUsersQuery() { Filters = filters, Pagination = paginationParams },
+                cancellationToken
             );
 
             if (getUsersResult.IsFailure)
@@ -81,9 +91,15 @@ namespace WebApi.Controllers.v1
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse>> GetById(int id)
+        public async Task<ActionResult<ApiResponse>> GetById(
+            int id,
+            CancellationToken cancellationToken
+        )
         {
-            var getByIdResult = await _mediator.Send(new GetUserByIdQuery() { UserId = id });
+            var getByIdResult = await _mediator.Send(
+                new GetUserByIdQuery() { UserId = id },
+                cancellationToken
+            );
             if (getByIdResult.IsFailure)
             {
                 return Problem(getByIdResult.Errors);
@@ -97,7 +113,11 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPatch("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> Update(
+            int id,
+            [FromBody] UpdateUserRequest request,
+            CancellationToken cancellationToken
+        )
         {
             var updateResult = await _mediator.Send(
                 new UpdateUserCommand()
@@ -107,7 +127,8 @@ namespace WebApi.Controllers.v1
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     Password = request.Password,
-                }
+                },
+                cancellationToken
             );
 
             if (updateResult.IsFailure)
@@ -122,7 +143,11 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Replace(int id, [FromBody] ReplaceUserRequest request)
+        public async Task<IActionResult> Replace(
+            int id,
+            [FromBody] ReplaceUserRequest request,
+            CancellationToken cancellationToken
+        )
         {
             var replaceResult = await _mediator.Send(
                 new ReplaceUserCommand()
@@ -132,7 +157,9 @@ namespace WebApi.Controllers.v1
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     Password = request.Password,
-                }
+                    Role = request.Role,
+                },
+                cancellationToken
             );
 
             if (replaceResult.IsFailure)
@@ -145,9 +172,12 @@ namespace WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id, CancellationToken cancellationToken)
         {
-            var deleteResult = await _mediator.Send(new DeleteUserCommand() { UserId = id });
+            var deleteResult = await _mediator.Send(
+                new DeleteUserCommand() { UserId = id },
+                cancellationToken
+            );
 
             if (!deleteResult.IsFailure)
             {

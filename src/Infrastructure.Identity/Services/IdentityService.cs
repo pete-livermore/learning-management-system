@@ -81,7 +81,8 @@ public class IdentityService : IIdentityService
     }
 
     public async Task<Result<ApplicationUserDto>> CreateUserAsync(
-        CreateApplicationUserDto createUserDto
+        CreateApplicationUserDto createUserDto,
+        CancellationToken cancellationToken = default
     )
     {
         string userEmail = createUserDto.Email;
@@ -92,7 +93,11 @@ public class IdentityService : IIdentityService
             UserName = userEmail,
         };
 
-        var createResult = await _userManager.CreateAsync(applicationUser, createUserDto.Password);
+        var createResult = await _userManager.CreateAsync(
+            applicationUser,
+            createUserDto.Password,
+            cancellationToken
+        );
 
         if (!createResult.Succeeded)
         {
@@ -100,7 +105,9 @@ public class IdentityService : IIdentityService
         }
         ;
 
-        var existingRoles = await _roleManager.Roles.Select(r => r.Name).ToHashSetAsync();
+        var existingRoles = await _roleManager
+            .Roles.Select(r => r.Name)
+            .ToHashSetAsync(cancellationToken);
         var requestedRoles = createUserDto.Roles.Distinct().ToList();
         var invalidRoles = requestedRoles.Where((r) => !existingRoles.Contains(r));
 

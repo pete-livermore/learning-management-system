@@ -27,11 +27,14 @@ namespace Infrastructure.Persistence.Repositories
             _context.DomainUsers.Add(newUser);
         }
 
-        public async Task<User?> FindByIdAsync(int id)
+        public async Task<User?> FindByIdAsync(
+            int id,
+            CancellationToken cancellationToken = default
+        )
         {
             try
             {
-                return await _context.DomainUsers.FindAsync(id);
+                return await _context.DomainUsers.FindAsync(id, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -40,14 +43,21 @@ namespace Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task<User?> FindByEmailAsync(string email)
+        public async Task<User?> FindByEmailAsync(
+            string email,
+            CancellationToken cancellationToken = default
+        )
         {
-            return await _context.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.DomainUsers.FirstOrDefaultAsync(
+                u => u.Email == email,
+                cancellationToken
+            );
         }
 
         public async Task<(List<User>, int totalPages)> FindManyAsync(
             UserFiltersDto? filters = null,
-            PaginationParamsDto? pagination = null
+            PaginationParamsDto? pagination = null,
+            CancellationToken cancellationToken = default
         )
         {
             var query = _context.DomainUsers.AsQueryable();
@@ -70,7 +80,7 @@ namespace Infrastructure.Persistence.Repositories
                 }
             }
 
-            var totalItems = await query.CountAsync();
+            var totalItems = await query.CountAsync(cancellationToken);
             int pageSize = pagination?.PageSize ?? 30;
             int pageIndex = pagination?.PageIndex ?? 1;
             var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -79,14 +89,14 @@ namespace Infrastructure.Persistence.Repositories
                 .OrderBy(b => b.Id)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return (users, totalPages);
         }
 
         public void Update(User userToUpdate)
         {
-            // Alternatively, ythe DbContext could have an interceptor or overridden SaveChanges method
+            // Alternatively, the DbContext could have an interceptor or overridden SaveChanges method
             // to automatically set audit fields like CreatedAt/UpdatedAt.
             userToUpdate.UpdatedAt = DateTime.UtcNow;
             _context.DomainUsers.Update(userToUpdate);
