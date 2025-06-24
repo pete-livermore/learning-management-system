@@ -5,7 +5,10 @@ namespace Application.Security.Interfaces
 {
     public interface IIdentityService
     {
-        Task<Result<ApplicationUserDto>> CreateUserAsync(CreateApplicationUserDto createUserDto);
+        Task<Result<ApplicationUserDto>> CreateUserAsync(
+            CreateApplicationUserDto createUserDto,
+            CancellationToken cancellationToken
+        );
         Task<Result<ApplicationUserDto>> FindUserByIdAsync(Guid userId);
         Task<Result<ApplicationUserDto>> FindUserByEmailAsync(string userEmail);
         Task<Result> UpdateUserAsync(
