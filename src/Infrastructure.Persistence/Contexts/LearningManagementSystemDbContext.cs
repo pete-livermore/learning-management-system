@@ -18,8 +18,9 @@ namespace Infrastructure.Persistence.Contexts
         public required DbSet<User> DomainUsers { get; set; }
         public required DbSet<UploadFile> Files { get; set; }
         public required DbSet<Lesson> Lessons { get; set; }
-        public required DbSet<LessonContent> LessonContents { get; set; }
+        public required DbSet<LessonSectionContent> LessonSectionContents { get; set; }
         public required DbSet<LessonSection> LessonSections { get; set; }
+        public required DbSet<LessonSectionProgress> LessonSectionProgresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

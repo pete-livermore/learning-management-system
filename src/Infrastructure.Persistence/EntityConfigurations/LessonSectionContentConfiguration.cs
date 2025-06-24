@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.EntityConfigurations;
 
-public class LessonContentConfiguration : IEntityTypeConfiguration<LessonContent>
+public class LessonContentConfiguration : IEntityTypeConfiguration<LessonSectionContent>
 {
-    public void Configure(EntityTypeBuilder<LessonContent> builder)
+    public void Configure(EntityTypeBuilder<LessonSectionContent> builder)
     {
         builder
             .HasDiscriminator<string>("content_type")
