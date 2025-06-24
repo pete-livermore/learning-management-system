@@ -85,6 +85,7 @@ public class IdentityService : IIdentityService
         CancellationToken cancellationToken = default
     )
     {
+        cancellationToken.ThrowIfCancellationRequested();
         string userEmail = createUserDto.Email;
         var applicationUser = new ApplicationUser()
         {
@@ -93,11 +94,7 @@ public class IdentityService : IIdentityService
             UserName = userEmail,
         };
 
-        var createResult = await _userManager.CreateAsync(
-            applicationUser,
-            createUserDto.Password,
-            cancellationToken
-        );
+        var createResult = await _userManager.CreateAsync(applicationUser, createUserDto.Password);
 
         if (!createResult.Succeeded)
         {
