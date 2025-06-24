@@ -26,6 +26,12 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
             Title = "Server error",
         };
 
+        if (exception is OperationCanceledException)
+        {
+            problemDetails.Status = StatusCodes.Status499ClientClosedRequest;
+            problemDetails.Title = "Client closed request";
+        }
+
         httpContext.Response.StatusCode = problemDetails.Status.Value;
 
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
