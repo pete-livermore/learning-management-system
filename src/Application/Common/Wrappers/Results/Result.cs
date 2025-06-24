@@ -14,7 +14,7 @@ public class Result
         var hasErrors = errors.Any(err => err != Error.None);
         if (isSuccess && hasErrors || !isSuccess && !hasErrors)
         {
-            throw new ArgumentException("Invalid errors", nameof(errors));
+            throw new ArgumentException("Invalid errors passed to Result", nameof(errors));
         }
 
         IsSuccess = isSuccess;
@@ -39,5 +39,7 @@ public class Result<T> : Result
 
     public static Result<T> Success(T data) => new(true, data, Error.None);
 
-    public static new Result<T> Failure(params Error[] errors) => new(false, default!, errors);
+    public static Result<T> Failure(Error error) => new(false, default!, [error]);
+
+    public static new Result<T> Failure(Error[] errors) => new(false, default!, errors);
 }
