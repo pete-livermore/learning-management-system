@@ -34,7 +34,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             try
             {
-                return await _context.DomainUsers.FindAsync(id, cancellationToken);
+                return await _context.DomainUsers.FindAsync(new object[] { id }, cancellationToken);
             }
             catch (Exception ex)
             {
