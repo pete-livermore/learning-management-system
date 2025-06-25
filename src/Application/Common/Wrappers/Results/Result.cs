@@ -24,7 +24,11 @@ public class Result
 
     public static Result Success() => new(true, Error.None);
 
-    public static Result Failure(params Error[] errors) => new(false, errors);
+    public static Result Failure(Error errors) => new(false, errors);
+
+    public static Result Failure(Error[] errors) => new(false, errors);
+
+    public static Result Failure(IEnumerable<Error> errors) => new(false, [.. errors]);
 }
 
 public class Result<T> : Result
@@ -39,7 +43,10 @@ public class Result<T> : Result
 
     public static Result<T> Success(T data) => new(true, data, Error.None);
 
-    public static Result<T> Failure(Error error) => new(false, default!, [error]);
+    public static new Result<T> Failure(Error error) => new(false, default!, [error]);
 
     public static new Result<T> Failure(Error[] errors) => new(false, default!, errors);
+
+    public static new Result<T> Failure(IEnumerable<Error> errors) =>
+        new(false, default!, [.. errors]);
 }
