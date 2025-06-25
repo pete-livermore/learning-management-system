@@ -15,14 +15,4 @@ public interface IUnitOfWork
     /// or a failure result if an error occurred during saving.
     /// </returns>
     Task<Result<int>> SaveChangesAsync(CancellationToken cancellationToken = default);
-
-    // You might consider adding other methods if you have specific transactional needs,
-    // but for most cases with EF Core, SaveChangesAsync is sufficient.
-    // For example:
-    // void BeginTransaction();
-    // void CommitTransaction();
-    // void RollbackTransaction();
-    // However, EF Core often handles transactions implicitly around SaveChangesAsync
-    // for single operations, or you can use DbContext.Database.BeginTransaction() directly
-    // in the implementation for more complex scenarios.
 }
